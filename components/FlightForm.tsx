@@ -15,6 +15,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
         flightNature: '',
         status: 'Agendado',
         aircraftType: '',
+        gesdocNumber: '',
         
         regVPArrival: '',
         origin: '',
@@ -305,6 +306,16 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
     const enableArrival = isArrival || isTurnaround;
     const enableDeparture = isDeparture || isTurnaround;
 
+    // Helper to get header style based on status
+    const getHeaderBadgeClass = () => {
+        switch (formData.status) {
+            case 'Realizado': return 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800';
+            case 'Cancelado': return 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-100 dark:border-red-800';
+            case 'Confirmado': return 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-100 dark:border-green-800';
+            default: return 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-100 dark:border-yellow-800';
+        }
+    };
+
     return (
         <div className="p-4 relative">
             {/* Toast */}
@@ -337,6 +348,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                     <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
                                         formData.status === 'Confirmado' ? 'bg-green-100 text-green-700' :
                                         formData.status === 'Realizado' ? 'bg-blue-100 text-blue-700' : 
+                                        formData.status === 'Cancelado' ? 'bg-red-100 text-red-700' :
                                         'bg-yellow-100 text-yellow-700'
                                     }`}>
                                         {formData.status}
@@ -379,7 +391,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                 {/* Compact Header */}
                 <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100 dark:border-gray-700">
                     <div className="flex items-center gap-3">
-                        <Shield className="w-8 h-8 text-primary dark:text-blue-500" />
+                        <Shield className={`w-8 h-8 ${formData.status === 'Realizado' ? 'text-blue-600' : 'text-primary dark:text-blue-500'}`} />
                         <div>
                             <h1 className="text-lg font-bold text-primary dark:text-blue-400 leading-none">
                                 {initialData ? `Editar Voo ${initialData.flightNumber}` : 'Ficha de Controlo de Voo Privado'}
@@ -399,8 +411,15 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                 Cancelar Edição
                             </button>
                         )}
-                        <div className="bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-3 py-1 rounded text-xs font-bold border border-green-100 dark:border-green-800">
-                            Registo Gesdoc
+                        <div className={`px-3 py-1 rounded text-xs font-bold border transition-colors flex items-center gap-2 ${getHeaderBadgeClass()}`}>
+                            <span>Registo Gesdoc:</span>
+                            <input 
+                                type="text"
+                                className="bg-transparent border-b border-current outline-none w-24 text-center placeholder-current/50 focus:border-current"
+                                placeholder="N.º"
+                                value={formData.gesdocNumber || ''}
+                                onChange={(e) => updateField('gesdocNumber', e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>

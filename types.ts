@@ -24,6 +24,9 @@ export interface FlightFormData {
     status: FlightStatus;
     aircraftType: string;
     
+    // Gesdoc
+    gesdocNumber?: string;
+    
     // Arrival Data
     regVPArrival?: string;
     origin: string;
