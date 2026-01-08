@@ -111,10 +111,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 
                 <MenuSection 
                     title="Registo de Voos" 
-                    icon={<Briefcase className="w-4 h-4" />} 
+                    icon={<Briefcase className="w-4 h-4 text-red-500" />} 
                     defaultOpen={true}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-red-500 font-extrabold"
                 >
                     <MenuItem 
                         icon={<Radar />} 
@@ -214,40 +215,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 </MenuSection>
 
                 <MenuSection 
-                    title="Formação PF008" 
-                    icon={<GraduationCap className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                >
-                    {!isCollapsed && (
-                        <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Plataformas de Formação e Ambiente de Testes
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem 
-                        icon={<MonitorPlay />} 
-                        label="Plataforma E-Learning" 
-                        onClick={() => openExternalLink('https://elearning.ssi.local')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<FlaskConical />} 
-                        label="Ambiente Teste PASSE" 
-                        onClick={() => alert('Ambiente Sandbox PASSE')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<FlaskConical />} 
-                        label="Ambiente Teste Portal" 
-                        onClick={() => alert('Ambiente Sandbox Portal')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
                     title="Links PF008" 
                     icon={<LinkIcon className="w-4 h-4" />} 
                     defaultOpen={false}
@@ -297,11 +264,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 </MenuSection>
 
                 <MenuSection 
-                    title="Documentação" 
-                    icon={<FolderOpen className="w-4 h-4" />} 
+                    title="GS PF008" 
+                    icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} 
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-yellow-500 font-extrabold"
                 >
                      <MenuItem 
                         icon={<Files />} 
@@ -324,15 +292,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         onClick={() => onChangeView('procedures')}
                         isCollapsed={isCollapsed}
                     />
-                </MenuSection>
 
-                <MenuSection 
-                    title="Relatórios" 
-                    icon={<PieChart className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                >
+                    {!isCollapsed && (
+                        <div className="px-4 pt-4 pb-1">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                                Relatórios
+                            </span>
+                        </div>
+                    )}
                     <MenuItem icon={<ClipboardList />} label="Relatório Turno" isCollapsed={isCollapsed} />
                     <MenuItem icon={<LineChart />} label="Relatório Semanal" isCollapsed={isCollapsed} />
                     <MenuItem icon={<BarChart />} label="Relatório Mensal" isCollapsed={isCollapsed} />
@@ -347,6 +314,41 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 >
                     <MenuItem icon={<Phone />} label="Lista Telefónica" isCollapsed={isCollapsed} />
                     <MenuItem icon={<Bell />} label="Piquetes / Urgências" isCollapsed={isCollapsed} />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Formação PF008" 
+                    icon={<GraduationCap className="w-4 h-4" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="font-extrabold text-white"
+                >
+                    {!isCollapsed && (
+                        <div className="px-4 pt-3 pb-1">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                                Plataformas de Formação e Ambiente de Testes
+                            </span>
+                        </div>
+                    )}
+                    <MenuItem 
+                        icon={<MonitorPlay />} 
+                        label="Plataforma E-Learning" 
+                        onClick={() => openExternalLink('https://elearning.ssi.local')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<FlaskConical />} 
+                        label="Ambiente Teste PASSE" 
+                        onClick={() => alert('Ambiente Sandbox PASSE')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<FlaskConical />} 
+                        label="Ambiente Teste Portal" 
+                        onClick={() => alert('Ambiente Sandbox Portal')}
+                        isCollapsed={isCollapsed}
+                    />
                 </MenuSection>
 
                 <div className="border-t border-white/10 mt-auto">
@@ -372,9 +374,10 @@ interface MenuSectionProps {
     defaultOpen?: boolean;
     isCollapsed?: boolean;
     onExpand?: () => void;
+    titleClassName?: string;
 }
 
-const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaultOpen = true, isCollapsed, onExpand }) => {
+const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaultOpen = true, isCollapsed, onExpand, titleClassName }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
 
     const handleHeaderClick = () => {
@@ -398,7 +401,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaul
                         {icon}
                     </span>
                     {!isCollapsed && (
-                        <span className={`text-xs uppercase font-bold tracking-wider ${isOpen ? 'text-white' : ''}`}>
+                        <span className={`text-xs uppercase font-bold tracking-wider ${titleClassName || (isOpen ? 'text-white' : '')}`}>
                             {title}
                         </span>
                     )}
