@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users } from 'lucide-react';
+import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users, MapPin } from 'lucide-react';
 import { FlightFormData, FlightType, FlightStatus, FlightNature } from '../types';
-import { saveFlight } from '../services/db';
+import { saveFlight, deleteFlight } from '../services/db';
 
 interface FlightFormProps {
     initialData?: FlightFormData | null;
@@ -43,6 +43,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
     };
 
     const [formData, setFormData] = useState<FlightFormData>(defaultForm);
+    const [savedId, setSavedId] = useState<string | null>(null);
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
@@ -52,8 +53,10 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
     useEffect(() => {
         if (initialData) {
             setFormData(initialData);
+            setSavedId(initialData.id || null);
         } else {
             setFormData(defaultForm);
+            setSavedId(null);
         }
     }, [initialData]);
 
@@ -250,12 +253,12 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
         }
 
         try {
-            await saveFlight(formData);
+            const id = await saveFlight(formData);
+            setSavedId(id);
+            setFormData(prev => ({ ...prev, id })); // Update local state with ID
+            
             // Trigger Success Modal
             setShowSuccessModal(true);
-            
-            // Optional status message (Modal covers this mostly)
-            setStatus({ type: 'success', message: `Voo ${formData.flightNumber} guardado com sucesso!` });
             
         } catch (error) {
             console.error(error);
@@ -263,19 +266,43 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
         }
     };
 
-    const closeSuccessModal = () => {
-        setShowSuccessModal(false);
-        if (!initialData) {
-             setFormData(defaultForm);
-             setErrors({});
-             setTouched({});
-        }
-        setStatus(null);
-    };
+    // --- Action Handlers ---
 
+    // 1. Continue Editing: Close modal, keep data
     const handleContinueEditing = () => {
         setShowSuccessModal(false);
         setStatus(null);
+    };
+
+    // 2. Archive: Close modal, CLEAR data (New Entry)
+    const handleArchive = () => {
+        setShowSuccessModal(false);
+        setFormData(defaultForm);
+        setSavedId(null);
+        setErrors({});
+        setTouched({});
+        setStatus({ type: 'success', message: 'Registo arquivado. Pronto para novo registo.' });
+        if (onClear) onClear(); // Clear parent editing state if applicable
+    };
+
+    // 3. Delete: Remove from DB, CLEAR data
+    const handleDeleteAction = async () => {
+        if (window.confirm('Tem a certeza que deseja eliminar este registo permanentemente?')) {
+            try {
+                if (savedId || formData.id) {
+                    await deleteFlight(savedId || formData.id || '');
+                }
+                handleArchive(); // Reset form after delete
+                setStatus({ type: 'success', message: 'Registo eliminado.' });
+            } catch (error) {
+                console.error("Error deleting", error);
+                setStatus({ type: 'error', message: 'Erro ao eliminar registo.' });
+            }
+        }
+    };
+
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
     };
 
     const renderInput = (label: string, field: keyof FlightFormData, type: string = "text", placeholder: string = "", disabled: boolean = false, required: boolean = false) => (
@@ -357,7 +384,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                     </span>
                                 </div>
 
-                                {/* Times */}
+                                {/* Timings and Type */}
                                 <div className="text-gray-300 text-sm space-y-1">
                                     {(isArrival || isTurnaround) && (
                                         <div className="flex items-center gap-2">
@@ -372,6 +399,16 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Route */}
+                                <div className="flex items-center gap-2 text-sm text-gray-400 font-medium">
+                                    <MapPin className="w-3.5 h-3.5 text-blue-400" />
+                                    <span>
+                                        {isArrival ? `${formData.origin} → LPPS` : 
+                                         isDeparture ? `LPPS → ${formData.destination}` : 
+                                         `${formData.origin} → ${formData.destination}`}
+                                    </span>
+                                </div>
                                 
                                 {/* Pax/Crew */}
                                 <div className="flex items-center gap-4 text-sm text-gray-400 pt-1">
@@ -385,6 +422,13 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                     </div>
                                 </div>
 
+                                {/* Observations */}
+                                {formData.observations && (
+                                    <div className="mt-2 bg-gray-800/30 p-2 rounded border-l-2 border-yellow-500/50">
+                                        <p className="text-xs text-gray-400 line-clamp-2 italic">"{formData.observations}"</p>
+                                    </div>
+                                )}
+
                                 <div className="text-gray-500 text-xs mt-1 font-medium truncate pt-3 border-t border-gray-700/50">
                                     <span className="text-gray-400 font-bold">Resp:</span> {formData.operator || 'Helder Sousa (PF008)'}
                                 </div>
@@ -392,39 +436,38 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                         </div>
 
                         {/* Action Icons */}
-                        <div className="flex justify-end gap-6 mt-8">
+                        <div className="flex justify-end gap-6 mt-8 border-t border-gray-700/30 pt-4">
                             <button 
                                 onClick={() => window.print()} 
-                                className="text-gray-400 hover:text-white transition-colors p-1"
-                                title="Imprimir"
+                                className="text-gray-400 hover:text-white transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                title="Imprimir Ficha"
                             >
                                 <Printer className="w-5 h-5" />
+                                <span className="text-[10px]">Imprimir</span>
                             </button>
                             <button 
                                 onClick={handleContinueEditing} 
-                                className="text-gray-400 hover:text-white transition-colors p-1"
-                                title="Editar"
+                                className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                title="Continuar a Editar"
                             >
                                 <Edit className="w-5 h-5" />
+                                <span className="text-[10px]">Editar</span>
                             </button>
                             <button 
-                                onClick={closeSuccessModal} 
-                                className="text-gray-400 hover:text-white transition-colors p-1"
-                                title="Arquivar / Fechar"
+                                onClick={handleArchive} 
+                                className="text-gray-400 hover:text-green-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                title="Arquivar e Novo"
                             >
                                 <Archive className="w-5 h-5" />
+                                <span className="text-[10px]">Arquivar</span>
                             </button>
                             <button 
-                                onClick={() => {
-                                    if(window.confirm('Apagar registo?')) {
-                                        setFormData(defaultForm);
-                                        closeSuccessModal();
-                                    }
-                                }} 
-                                className="text-gray-400 hover:text-white transition-colors p-1"
-                                title="Apagar"
+                                onClick={handleDeleteAction}
+                                className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                title="Apagar Registo"
                             >
                                 <Trash2 className="w-5 h-5" />
+                                <span className="text-[10px]">Eliminar</span>
                             </button>
                         </div>
                     </div>
