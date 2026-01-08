@@ -1,14 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users, MapPin } from 'lucide-react';
-import { FlightFormData, FlightType, FlightStatus, FlightNature } from '../types';
+import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users, MapPin, Hash, Tag, UserCheck } from 'lucide-react';
+import { FlightFormData, FlightType, FlightStatus, FlightNature, UserProfile } from '../types';
 import { saveFlight, deleteFlight } from '../services/db';
 
 interface FlightFormProps {
     initialData?: FlightFormData | null;
     onClear?: () => void;
+    currentUser?: UserProfile | null;
 }
 
-const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
+const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUser }) => {
     const defaultForm: FlightFormData = {
         flightNumber: '',
         flightType: '',
@@ -16,6 +17,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
         status: 'Agendado',
         aircraftType: '',
         gesdocNumber: '',
+        createdBy: '',
+        createdByCategory: '',
         
         regVPArrival: '',
         origin: '',
@@ -55,10 +58,15 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
             setFormData(initialData);
             setSavedId(initialData.id || null);
         } else {
-            setFormData(defaultForm);
+            // New flight: Set creator and category
+            setFormData({
+                ...defaultForm,
+                createdBy: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : '',
+                createdByCategory: currentUser ? currentUser.category : ''
+            });
             setSavedId(null);
         }
-    }, [initialData]);
+    }, [initialData, currentUser]);
 
     // Checklist Items
     const checklistItemsArrival = [
@@ -277,7 +285,12 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
     // 2. Archive: Close modal, CLEAR data (New Entry)
     const handleArchive = () => {
         setShowSuccessModal(false);
-        setFormData(defaultForm);
+        setFormData({
+            ...defaultForm,
+            // Re-apply current agent for new form
+            createdBy: currentUser ? `${currentUser.firstName} ${currentUser.lastName}` : '',
+            createdByCategory: currentUser ? currentUser.category : ''
+        });
         setSavedId(null);
         setErrors({});
         setTouched({});
@@ -409,6 +422,30 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                          `${formData.origin} → ${formData.destination}`}
                                     </span>
                                 </div>
+
+                                {/* Internal Numbers & Gesdoc */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {formData.gesdocNumber && (
+                                        <div className="bg-white/10 px-2 py-1 rounded text-[10px] text-gray-300 border border-white/10 flex items-center gap-1" title="Número Gesdoc">
+                                            <Hash className="w-3 h-3 text-white" />
+                                            <span className="font-bold text-white">GESDOC:</span> {formData.gesdocNumber}
+                                        </div>
+                                    )}
+
+                                    {(isArrival || isTurnaround) && formData.regVPArrival && (
+                                        <div className="bg-blue-900/40 px-2 py-1 rounded text-[10px] text-blue-200 border border-blue-800/50 flex items-center gap-1" title="Registo VP Chegada">
+                                            <Tag className="w-3 h-3" />
+                                            <span className="font-bold">VP Che:</span> {formData.regVPArrival}
+                                        </div>
+                                    )}
+
+                                    {(isDeparture || isTurnaround) && formData.regVPDeparture && (
+                                        <div className="bg-orange-900/40 px-2 py-1 rounded text-[10px] text-orange-200 border border-orange-800/50 flex items-center gap-1" title="Registo VP Partida">
+                                            <Tag className="w-3 h-3" />
+                                            <span className="font-bold">VP Par:</span> {formData.regVPDeparture}
+                                        </div>
+                                    )}
+                                </div>
                                 
                                 {/* Pax/Crew */}
                                 <div className="flex items-center gap-4 text-sm text-gray-400 pt-1">
@@ -429,8 +466,23 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                     </div>
                                 )}
 
-                                <div className="text-gray-500 text-xs mt-1 font-medium truncate pt-3 border-t border-gray-700/50">
-                                    <span className="text-gray-400 font-bold">Resp:</span> {formData.operator || 'Helder Sousa (PF008)'}
+                                <div className="flex justify-between items-start mt-3 pt-3 border-t border-gray-700/50">
+                                    <div className="text-xs">
+                                        <span className="text-gray-400 font-bold block mb-0.5">Comp. Aérea / Operadora:</span>
+                                        <span className="text-gray-300 font-medium">{formData.operator || '---'}</span>
+                                    </div>
+                                    <div className="text-xs text-right">
+                                        <span className="text-gray-400 font-bold block mb-0.5">Agente:</span>
+                                        <div className="text-gray-300 font-medium flex flex-col items-end">
+                                            <span className="flex items-center gap-1">
+                                                {formData.createdBy || '---'}
+                                                <UserCheck className="w-3 h-3 text-blue-400" />
+                                            </span>
+                                            {formData.createdByCategory && (
+                                                <span className="text-[9px] text-gray-500">{formData.createdByCategory}</span>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -518,7 +570,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                         {renderInput("N.º Voo", "flightNumber", "text", "TP1699", false, true)}
                         {renderInput("Aeronave", "aircraftType", "text", "Cessna 172", false, true)}
-                        {renderInput("Operador", "operator", "text", "NetJets", false, true)}
+                        {renderInput("Companhia Aérea / Operadora", "operator", "text", "NetJets", false, true)}
                         
                         <div className="space-y-1">
                             <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status</label>
@@ -910,6 +962,23 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
                                 accept=".pdf,.csv,.xlsx,.xls,.docx,.doc" 
                                 onChange={handleFileChange}
                             />
+                        </div>
+
+                        {/* Agent Info Field - Read Only */}
+                        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700 p-4 flex items-center gap-3">
+                             <div className="bg-primary/10 dark:bg-blue-900/30 p-2 rounded-full">
+                                <UserCheck className="w-5 h-5 text-primary dark:text-blue-400" />
+                             </div>
+                             <div className="flex-1">
+                                <label className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">Registado Por</label>
+                                <div className="font-medium text-gray-900 dark:text-gray-100">
+                                    {formData.createdBy || '---'}
+                                    {formData.createdByCategory && <span className="text-gray-500 dark:text-gray-400 text-sm font-normal"> - {formData.createdByCategory}</span>}
+                                </div>
+                             </div>
+                             <div className="text-xs text-gray-400">
+                                {new Date().toLocaleDateString('pt-PT')}
+                             </div>
                         </div>
                     </div>
 

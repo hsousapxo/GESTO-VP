@@ -78,7 +78,7 @@ function App() {
             case 'dashboard':
                 return <Dashboard onChangeView={setCurrentView} />;
             case 'flight-form':
-                return <FlightForm initialData={editingFlight} onClear={handleClearEdit} />;
+                return <FlightForm initialData={editingFlight} onClear={handleClearEdit} currentUser={user} />;
             case 'flight-list':
                 return <FlightList onEdit={handleEditFlight} />;
             case 'flight-tracker':

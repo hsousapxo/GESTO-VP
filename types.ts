@@ -18,6 +18,8 @@ export type FlightNature =
 export interface FlightFormData {
     id?: string;
     createdAt?: Date;
+    createdBy?: string; // Agent Name
+    createdByCategory?: string; // Agent Category
     flightNumber: string;
     flightType: FlightType | ''; // Now includes TURNAROUND
     flightNature: FlightNature | '';
