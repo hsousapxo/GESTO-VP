@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer } from 'lucide-react';
+import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users } from 'lucide-react';
 import { FlightFormData, FlightType, FlightStatus, FlightNature } from '../types';
 import { saveFlight } from '../services/db';
 
@@ -257,10 +257,6 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
             // Optional status message (Modal covers this mostly)
             setStatus({ type: 'success', message: `Voo ${formData.flightNumber} guardado com sucesso!` });
             
-            // Do not clear immediately if editing, allow user to close modal first
-            // But if it's a new flight, maybe clear?
-            // Let's keep data in form until user decides to close modal or clear.
-            
         } catch (error) {
             console.error(error);
             setStatus({ type: 'error', message: 'Erro ao guardar voo.' });
@@ -270,11 +266,15 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
     const closeSuccessModal = () => {
         setShowSuccessModal(false);
         if (!initialData) {
-            // Only reset if it was a new creation, otherwise keep data for further editing
              setFormData(defaultForm);
              setErrors({});
              setTouched({});
         }
+        setStatus(null);
+    };
+
+    const handleContinueEditing = () => {
+        setShowSuccessModal(false);
         setStatus(null);
     };
 
@@ -316,6 +316,9 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
         }
     };
 
+    const totalPax = (formData.arrivalUeCount || 0) + (formData.arrivalNonSchengenCount || 0) + (formData.departureUeCount || 0) + (formData.departureNonSchengenCount || 0);
+    const totalCrew = (formData.arrivalCrewCount || 0) + (formData.departureCrewCount || 0);
+
     return (
         <div className="p-4 relative">
             {/* Toast */}
@@ -328,59 +331,101 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear }) => {
 
             {/* SUCCESS MODAL */}
             {showSuccessModal && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-green-100 dark:border-green-900">
-                        <div className="bg-green-600 p-6 flex flex-col items-center justify-center text-white">
-                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                                <CheckCircle className="w-10 h-10 text-white" />
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md p-6 border border-gray-700">
+                        
+                        <div className="flex gap-5">
+                            {/* Blue Icon */}
+                            <div className="w-14 h-14 bg-blue-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <File className="w-7 h-7 text-blue-500" />
                             </div>
-                            <h2 className="text-2xl font-bold">Registo Efetuado!</h2>
-                            <p className="opacity-90 mt-1">O voo foi gravado na base de dados.</p>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Voo</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold text-lg">{formData.flightNumber}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Status</span>
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${
-                                        formData.status === 'Confirmado' ? 'bg-green-100 text-green-700' :
-                                        formData.status === 'Realizado' ? 'bg-blue-100 text-blue-700' : 
-                                        formData.status === 'Cancelado' ? 'bg-red-100 text-red-700' :
-                                        'bg-yellow-100 text-yellow-700'
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0 space-y-2">
+                                {/* Header: Number + Status */}
+                                <div className="flex justify-between items-start">
+                                    <h2 className="text-2xl font-bold text-white leading-tight truncate">
+                                        {formData.flightNumber}
+                                    </h2>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                        formData.status === 'Confirmado' ? 'bg-green-500/20 text-green-400' :
+                                        formData.status === 'Realizado' ? 'bg-blue-500/20 text-blue-400' :
+                                        formData.status === 'Cancelado' ? 'bg-red-500/20 text-red-400' :
+                                        'bg-yellow-500/20 text-yellow-400'
                                     }`}>
                                         {formData.status}
                                     </span>
                                 </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Total POB</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold text-lg">
-                                        {(formData.arrivalUeCount + formData.arrivalNonSchengenCount + formData.arrivalCrewCount + 
-                                          formData.departureUeCount + formData.departureNonSchengenCount + formData.departureCrewCount)}
-                                    </span>
+
+                                {/* Times */}
+                                <div className="text-gray-300 text-sm space-y-1">
+                                    {(isArrival || isTurnaround) && (
+                                        <div className="flex items-center gap-2">
+                                            <PlaneLanding className="w-3.5 h-3.5 text-gray-500" /> 
+                                            <span className="truncate">Che: {formData.scheduleTimeArrival || '--:--'} ({formData.dateArrival ? new Date(formData.dateArrival).toLocaleDateString('pt-PT') : '--/--'})</span>
+                                        </div>
+                                    )}
+                                    {(isDeparture || isTurnaround) && (
+                                        <div className="flex items-center gap-2">
+                                            <PlaneTakeoff className="w-3.5 h-3.5 text-gray-500" /> 
+                                            <span className="truncate">Par: {formData.scheduleTimeDeparture || '--:--'} ({formData.dateDeparture ? new Date(formData.dateDeparture).toLocaleDateString('pt-PT') : '--/--'})</span>
+                                        </div>
+                                    )}
                                 </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Operador</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold truncate">{formData.operator}</span>
+                                
+                                {/* Pax/Crew */}
+                                <div className="flex items-center gap-4 text-sm text-gray-400 pt-1">
+                                    <div className="flex items-center gap-1.5 bg-gray-800/50 px-2 py-1 rounded">
+                                        <Users className="w-3.5 h-3.5" />
+                                        <span>Pax: <span className="text-white font-bold">{totalPax}</span></span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 bg-gray-800/50 px-2 py-1 rounded">
+                                        <span className="font-bold text-[10px] border border-gray-600 px-1 rounded-sm">CRW</span>
+                                        <span>Trip: <span className="text-white font-bold">{totalCrew}</span></span>
+                                    </div>
+                                </div>
+
+                                <div className="text-gray-500 text-xs mt-1 font-medium truncate pt-3 border-t border-gray-700/50">
+                                    <span className="text-gray-400 font-bold">Resp:</span> {formData.operator || 'Helder Sousa (PF008)'}
                                 </div>
                             </div>
-                            
-                            <div className="flex gap-3 mt-6">
-                                <button 
-                                    onClick={() => window.print()}
-                                    className="flex-1 flex items-center justify-center gap-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 py-3 rounded-lg font-medium transition-colors"
-                                >
-                                    <Printer className="w-4 h-4" /> Imprimir
-                                </button>
-                                <button 
-                                    onClick={closeSuccessModal}
-                                    className="flex-1 bg-primary hover:bg-secondary text-white py-3 rounded-lg font-medium transition-colors shadow-lg shadow-blue-500/30"
-                                >
-                                    Fechar Janela
-                                </button>
-                            </div>
+                        </div>
+
+                        {/* Action Icons */}
+                        <div className="flex justify-end gap-6 mt-8">
+                            <button 
+                                onClick={() => window.print()} 
+                                className="text-gray-400 hover:text-white transition-colors p-1"
+                                title="Imprimir"
+                            >
+                                <Printer className="w-5 h-5" />
+                            </button>
+                            <button 
+                                onClick={handleContinueEditing} 
+                                className="text-gray-400 hover:text-white transition-colors p-1"
+                                title="Editar"
+                            >
+                                <Edit className="w-5 h-5" />
+                            </button>
+                            <button 
+                                onClick={closeSuccessModal} 
+                                className="text-gray-400 hover:text-white transition-colors p-1"
+                                title="Arquivar / Fechar"
+                            >
+                                <Archive className="w-5 h-5" />
+                            </button>
+                            <button 
+                                onClick={() => {
+                                    if(window.confirm('Apagar registo?')) {
+                                        setFormData(defaultForm);
+                                        closeSuccessModal();
+                                    }
+                                }} 
+                                className="text-gray-400 hover:text-white transition-colors p-1"
+                                title="Apagar"
+                            >
+                                <Trash2 className="w-5 h-5" />
+                            </button>
                         </div>
                     </div>
                 </div>
