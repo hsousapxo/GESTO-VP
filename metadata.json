@@ -1,0 +1,9 @@
+{
+  "name": "GESTO VP",
+  "description": "A comprehensive air border control application featuring flight registration, passenger counting, weather dashboards, and AI-powered assistance using Gemini models.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera",
+    "geolocation"
+  ]
+}
