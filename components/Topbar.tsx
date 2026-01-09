@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Sun, Search, Plus, Bell, ChevronDown, Moon, X, Plane, Calendar, FileText, BarChart, Map, Shield, Command, Archive } from 'lucide-react';
-import { ViewState, UserProfile } from '../types';
+import { Menu, Sun, Search, Plus, Bell, ChevronDown, Moon, X, Plane, Calendar, FileText, BarChart, Map, Shield, Command, Archive, File } from 'lucide-react';
+import { ViewState, UserProfile, FlightFormData } from '../types';
+import { getFlights } from '../services/db';
 
 interface TopbarProps {
     onToggleSidebar: () => void;
@@ -10,19 +11,43 @@ interface TopbarProps {
     user: UserProfile | null;
 }
 
-// Searchable items mapping
-const SEARCH_ITEMS: { label: string; view: ViewState; icon: React.ReactNode; keywords: string[] }[] = [
-    { label: 'Dashboard', view: 'dashboard', icon: <Shield className="w-4 h-4" />, keywords: ['home', 'inicio', 'geral'] },
-    { label: 'Novo Voo', view: 'flight-form', icon: <Plus className="w-4 h-4" />, keywords: ['criar', 'registar', 'adicionar'] },
-    { label: 'Voos Agendados', view: 'flight-list', icon: <Plane className="w-4 h-4" />, keywords: ['pesquisar', 'ver', 'tabela', 'lista'] },
-    { label: 'Arquivo Voos', view: 'flight-archive', icon: <Archive className="w-4 h-4" />, keywords: ['antigos', 'passados', 'historico'] },
-    { label: 'Radar de Voos', view: 'flight-tracker', icon: <Map className="w-4 h-4" />, keywords: ['mapa', 'live', 'rastreio'] },
-    { label: 'Lembretes', view: 'reminders', icon: <Bell className="w-4 h-4" />, keywords: ['tarefas', 'avisos', 'agenda'] },
-    { label: 'Estatísticas', view: 'statistics', icon: <BarChart className="w-4 h-4" />, keywords: ['graficos', 'analise', 'relatorios'] },
-    { label: 'Modelos', view: 'templates', icon: <FileText className="w-4 h-4" />, keywords: ['docs', 'formularios', 'impressos'] },
-    { label: 'Meteorologia', view: 'weather', icon: <Sun className="w-4 h-4" />, keywords: ['tempo', 'clima', 'previsao'] },
-    { label: 'Calendário', view: 'calendar-monthly', icon: <Calendar className="w-4 h-4" />, keywords: ['mensal', 'agenda'] },
+// Searchable items mapping (Navigation)
+const NAV_ITEMS = [
+    { label: 'Dashboard', view: 'dashboard' as ViewState, icon: <Shield className="w-4 h-4" />, keywords: ['home', 'inicio', 'geral'] },
+    { label: 'Novo Voo', view: 'flight-form' as ViewState, icon: <Plus className="w-4 h-4" />, keywords: ['criar', 'registar', 'adicionar'] },
+    { label: 'Voos Agendados', view: 'flight-list' as ViewState, icon: <Plane className="w-4 h-4" />, keywords: ['pesquisar', 'ver', 'tabela', 'lista'] },
+    { label: 'Arquivo Voos', view: 'flight-archive' as ViewState, icon: <Archive className="w-4 h-4" />, keywords: ['antigos', 'passados', 'historico'] },
+    { label: 'Radar de Voos', view: 'flight-tracker' as ViewState, icon: <Map className="w-4 h-4" />, keywords: ['mapa', 'live', 'rastreio'] },
+    { label: 'Lembretes', view: 'reminders' as ViewState, icon: <Bell className="w-4 h-4" />, keywords: ['tarefas', 'avisos', 'agenda'] },
+    { label: 'Estatísticas', view: 'statistics' as ViewState, icon: <BarChart className="w-4 h-4" />, keywords: ['graficos', 'analise', 'relatorios'] },
+    { label: 'Modelos', view: 'templates' as ViewState, icon: <FileText className="w-4 h-4" />, keywords: ['docs', 'formularios', 'impressos'] },
+    { label: 'Meteorologia', view: 'weather' as ViewState, icon: <Sun className="w-4 h-4" />, keywords: ['tempo', 'clima', 'previsao'] },
+    { label: 'Calendário', view: 'calendar-monthly' as ViewState, icon: <Calendar className="w-4 h-4" />, keywords: ['mensal', 'agenda'] },
 ];
+
+// Mock Data for Global Search (simulating data that exists in other components)
+const MOCK_TEMPLATES = [
+    { name: 'Modelo de Auto de Notícia', view: 'templates' },
+    { name: 'Ficha de Passageiro (Manual)', view: 'templates' },
+    { name: 'Termo de Responsabilidade', view: 'templates' },
+    { name: 'Relatório de Ocorrência', view: 'templates' },
+    { name: 'Requisição de Material', view: 'templates' },
+    { name: 'Declaração de Entrada/Saída', view: 'templates' },
+];
+
+const MOCK_REMINDERS = [
+    { subject: 'Verificar validade dos selos', view: 'reminders' },
+    { subject: 'Chegada Cessna Citation', view: 'reminders' },
+    { subject: 'Coordenação com a GNR', view: 'reminders' },
+];
+
+interface SearchResultItem {
+    label: string;
+    subLabel?: string;
+    view: ViewState;
+    icon: React.ReactNode;
+    type: 'nav' | 'flight' | 'template' | 'reminder';
+}
 
 const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMode, onChangeView, user }) => {
     const [greeting, setGreeting] = useState('');
@@ -31,8 +56,11 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
     const [isNewMenuOpen, setIsNewMenuOpen] = useState(false);
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState(SEARCH_ITEMS);
+    const [searchResults, setSearchResults] = useState<SearchResultItem[]>([]);
     const [showSearchResults, setShowSearchResults] = useState(false);
+    
+    // Data States
+    const [flights, setFlights] = useState<FlightFormData[]>([]);
 
     // Refs for click outside
     const newMenuRef = useRef<HTMLDivElement>(null);
@@ -44,6 +72,9 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
         if (hour >= 5 && hour < 12) setGreeting('Bom dia');
         else if (hour >= 12 && hour < 20) setGreeting('Boa tarde');
         else setGreeting('Boa noite');
+
+        // Load Flights for search context
+        getFlights().then(setFlights).catch(console.error);
 
         // Click outside listener
         const handleClickOutside = (event: MouseEvent) => {
@@ -65,16 +96,61 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
     // Search Logic
     useEffect(() => {
         if (!searchQuery.trim()) {
-            setSearchResults(SEARCH_ITEMS);
+            // Default to showing navigation items as "Quick Links" when empty but focused
+            setSearchResults(NAV_ITEMS.map(item => ({
+                ...item,
+                subLabel: 'Menu',
+                type: 'nav'
+            })));
             return;
         }
+
         const lowerQuery = searchQuery.toLowerCase();
-        const filtered = SEARCH_ITEMS.filter(item => 
+        
+        // 1. Filter Navigation
+        const navResults: SearchResultItem[] = NAV_ITEMS.filter(item => 
             item.label.toLowerCase().includes(lowerQuery) || 
             item.keywords.some(k => k.includes(lowerQuery))
-        );
-        setSearchResults(filtered);
-    }, [searchQuery]);
+        ).map(item => ({ ...item, subLabel: 'Menu', type: 'nav' }));
+
+        // 2. Filter Flights
+        const flightResults: SearchResultItem[] = flights.filter(f => 
+            f.flightNumber.toLowerCase().includes(lowerQuery) ||
+            f.operator.toLowerCase().includes(lowerQuery) ||
+            (f.origin && f.origin.toLowerCase().includes(lowerQuery)) ||
+            (f.destination && f.destination.toLowerCase().includes(lowerQuery))
+        ).map(f => ({
+            label: f.flightNumber,
+            subLabel: `${f.origin || '?'} ➔ ${f.destination || '?'} (${f.status})`,
+            view: 'flight-list',
+            icon: <Plane className="w-4 h-4" />,
+            type: 'flight'
+        }));
+
+        // 3. Filter Templates
+        const templateResults: SearchResultItem[] = MOCK_TEMPLATES.filter(t => 
+            t.name.toLowerCase().includes(lowerQuery)
+        ).map(t => ({
+            label: t.name,
+            subLabel: 'Documento',
+            view: 'templates',
+            icon: <File className="w-4 h-4" />,
+            type: 'template'
+        }));
+
+        // 4. Filter Reminders
+        const reminderResults: SearchResultItem[] = MOCK_REMINDERS.filter(r => 
+            r.subject.toLowerCase().includes(lowerQuery)
+        ).map(r => ({
+            label: r.subject,
+            subLabel: 'Lembrete',
+            view: 'reminders',
+            icon: <Bell className="w-4 h-4" />,
+            type: 'reminder'
+        }));
+
+        setSearchResults([...navResults, ...flightResults, ...templateResults, ...reminderResults]);
+    }, [searchQuery, flights]);
 
     const handleNavigate = (view: ViewState) => {
         onChangeView?.(view);
@@ -82,6 +158,15 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
         setSearchQuery('');
         setIsNewMenuOpen(false);
         setIsNotifOpen(false);
+    };
+
+    const getResultColor = (type: string) => {
+        switch (type) {
+            case 'flight': return 'text-blue-500';
+            case 'template': return 'text-green-500';
+            case 'reminder': return 'text-orange-500';
+            default: return 'text-gray-400 dark:text-gray-500';
+        }
     };
 
     return (
@@ -163,15 +248,16 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
                         </button>
                     )}
                     
-                    {/* Search Bar */}
+                    {/* GLOBAL SEARCH BAR */}
                     <div className="relative" ref={searchRef}>
-                        <div className={`flex items-center transition-all duration-300 ${showSearchResults || searchQuery ? 'w-48 md:w-64 bg-[#0a0e17] px-3 py-1.5 rounded-lg border border-gray-700' : 'w-8'}`}>
+                        <div className={`flex items-center transition-all duration-300 ${showSearchResults || searchQuery ? 'w-56 md:w-80 bg-[#0a0e17] px-3 py-1.5 rounded-lg border border-gray-700 shadow-inner' : 'w-8'}`}>
                             <button 
                                 onClick={() => {
                                     setShowSearchResults(!showSearchResults);
                                     if(!showSearchResults) setTimeout(() => document.getElementById('global-search')?.focus(), 100);
                                 }}
                                 className="text-gray-400 hover:text-white transition-colors flex-shrink-0"
+                                title="Pesquisar..."
                             >
                                 <Search className="w-6 h-6 stroke-[1.5]" />
                             </button>
@@ -181,13 +267,13 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Pesquisar..."
+                                    placeholder="Pesquisar voos, docs..."
                                     className="w-full bg-transparent border-none outline-none text-white text-sm ml-2 placeholder-gray-600"
                                     autoComplete="off"
                                 />
                             )}
                             {(searchQuery && showSearchResults) && (
-                                <button onClick={() => setSearchQuery('')} className="text-gray-500 hover:text-white ml-1">
+                                <button onClick={() => { setSearchQuery(''); document.getElementById('global-search')?.focus(); }} className="text-gray-500 hover:text-white ml-1">
                                     <X className="w-4 h-4" />
                                 </button>
                             )}
@@ -195,24 +281,39 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
 
                         {/* Search Results Dropdown */}
                         {showSearchResults && (
-                            <div className="absolute top-full right-0 mt-4 w-64 md:w-80 bg-white dark:bg-[#1a2333] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                            <div className="absolute top-full right-0 mt-4 w-72 md:w-96 bg-white dark:bg-[#1a2333] border border-gray-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-100 origin-top-right z-[60]">
                                 <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-black/20 text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
-                                    <Command className="w-3 h-3" /> Menu
+                                    <Command className="w-3 h-3" /> 
+                                    {searchQuery ? 'Resultados' : 'Sugestões'}
                                 </div>
-                                <div className="max-h-[300px] overflow-y-auto custom-scrollbar">
+                                <div className="max-h-[350px] overflow-y-auto custom-scrollbar">
                                     {searchResults.length > 0 ? (
                                         searchResults.map((item, idx) => (
                                             <button 
                                                 key={idx}
                                                 onClick={() => handleNavigate(item.view)}
-                                                className="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-blue-500/20 hover:text-blue-600 dark:hover:text-blue-300 flex items-center gap-3 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0"
+                                                className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-blue-500/10 flex items-start gap-3 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0 group"
                                             >
-                                                <span className="text-gray-400 dark:text-gray-500">{item.icon}</span>
-                                                {item.label}
+                                                <div className={`mt-0.5 ${getResultColor(item.type)}`}>
+                                                    {item.icon}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-bold text-gray-800 dark:text-gray-200 truncate group-hover:text-blue-500 dark:group-hover:text-blue-400">
+                                                        {item.label}
+                                                    </p>
+                                                    {item.subLabel && (
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                                            {item.subLabel}
+                                                        </p>
+                                                    )}
+                                                </div>
                                             </button>
                                         ))
                                     ) : (
-                                        <div className="p-4 text-center text-sm text-gray-500">Sem resultados</div>
+                                        <div className="p-6 text-center text-sm text-gray-500">
+                                            <Search className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                                            Nenhum resultado encontrado para "{searchQuery}"
+                                        </div>
                                     )}
                                 </div>
                             </div>

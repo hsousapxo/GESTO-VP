@@ -156,6 +156,15 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
             case 'operator':
                 if (!value.trim()) error = 'Obrigatório.';
                 break;
+            // Date and Time Validations
+            case 'dateArrival':
+            case 'dateDeparture':
+                if (!value) error = 'Data obrigatória.';
+                break;
+            case 'scheduleTimeArrival':
+            case 'scheduleTimeDeparture':
+                if (!value) error = 'Hora obrigatória.';
+                break;
         }
         return error;
     };
@@ -234,6 +243,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
         if (formData.flightType === FlightType.ARRIVAL || formData.flightType === FlightType.TURNAROUND) {
             if (!formData.origin.trim()) { newErrors.origin = 'Origem obrigatória'; isValid = false; }
             if (!formData.regVPArrival?.trim()) { newErrors.regVPArrival = 'Reg VP obrigatório'; isValid = false; }
+            if (!formData.dateArrival) { newErrors.dateArrival = 'Data obrigatória'; isValid = false; }
+            if (!formData.scheduleTimeArrival) { newErrors.scheduleTimeArrival = 'Hora obrigatória'; isValid = false; }
             
             // Validate Arrival Checklist Type (SCH vs NSCH)
             if (!formData.checklist?.['arrival_type_sch'] && !formData.checklist?.['arrival_type_nsch']) {
@@ -244,6 +255,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
         if (formData.flightType === FlightType.DEPARTURE || formData.flightType === FlightType.TURNAROUND) {
             if (!formData.destination.trim()) { newErrors.destination = 'Destino obrigatório'; isValid = false; }
             if (!formData.regVPDeparture?.trim()) { newErrors.regVPDeparture = 'Reg VP obrigatório'; isValid = false; }
+            if (!formData.dateDeparture) { newErrors.dateDeparture = 'Data obrigatória'; isValid = false; }
+            if (!formData.scheduleTimeDeparture) { newErrors.scheduleTimeDeparture = 'Hora obrigatória'; isValid = false; }
 
              // Validate Departure Checklist Type (SCH vs NSCH)
              if (!formData.checklist?.['departure_type_sch'] && !formData.checklist?.['departure_type_nsch']) {
@@ -329,7 +342,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             <input 
-                type="text" 
+                type={type} 
                 className={`w-full px-3 py-1.5 text-sm border rounded-md transition-all outline-none disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 
                 ${errors[field] 
                     ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
@@ -354,9 +367,9 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
     // Helper to get header style based on status
     const getHeaderBadgeClass = () => {
         switch (formData.status) {
-            case 'Realizado': return 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800';
+            case 'Realizado': return 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-100 dark:border-green-800';
             case 'Cancelado': return 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-100 dark:border-red-800';
-            case 'Confirmado': return 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-100 dark:border-green-800';
+            case 'Confirmado': return 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800';
             case 'Arquivado': return 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-800';
             default: return 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-100 dark:border-yellow-800';
         }
@@ -403,8 +416,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                         {formData.flightNumber}
                                     </h2>
                                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                                        formData.status === 'Confirmado' ? 'bg-green-500/20 text-green-400' :
-                                        formData.status === 'Realizado' ? 'bg-blue-500/20 text-blue-400' :
+                                        formData.status === 'Confirmado' ? 'bg-blue-500/20 text-blue-400' :
+                                        formData.status === 'Realizado' ? 'bg-green-500/20 text-green-400' :
                                         formData.status === 'Cancelado' ? 'bg-red-500/20 text-red-400' :
                                         formData.status === 'Arquivado' ? 'bg-purple-500/20 text-purple-400' :
                                         'bg-yellow-500/20 text-yellow-400'
@@ -624,8 +637,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                 <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status</label>
                                 <select 
                                     className={`w-full px-3 py-1.5 text-sm border rounded-md outline-none focus:ring-1 focus:ring-primary font-bold ${
-                                        formData.status === 'Realizado' ? 'bg-blue-50 text-blue-700 border-blue-300' :
-                                        formData.status === 'Confirmado' ? 'bg-green-50 text-green-700 border-green-300' :
+                                        formData.status === 'Realizado' ? 'bg-green-50 text-green-700 border-green-300' :
+                                        formData.status === 'Confirmado' ? 'bg-blue-50 text-blue-700 border-blue-300' :
                                         formData.status === 'Cancelado' ? 'bg-red-50 text-red-700 border-red-300' :
                                         formData.status === 'Arquivado' ? 'bg-purple-50 text-purple-700 border-purple-300' :
                                         'bg-yellow-50 text-yellow-700 border-yellow-300'
@@ -743,8 +756,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-2">
-                                        {renderInput("Hora Prevista", "scheduleTimeArrival", "time", "", !enableArrival)}
-                                        {renderInput("Data Chegada", "dateArrival", "date", "", !enableArrival)}
+                                        {renderInput("Hora Prevista", "scheduleTimeArrival", "time", "", !enableArrival, true)}
+                                        {renderInput("Data Chegada", "dateArrival", "date", "", !enableArrival, true)}
                                     </div>
 
                                     {/* Arrival POB */}
@@ -869,8 +882,8 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
 
                                     {renderInput("Destino", "destination", "text", "Aeroporto Destino", !enableDeparture, enableDeparture)}
                                     <div className="grid grid-cols-2 gap-2">
-                                        {renderInput("Hora Prevista", "scheduleTimeDeparture", "time", "", !enableDeparture)}
-                                        {renderInput("Data Partida", "dateDeparture", "date", "", !enableDeparture)}
+                                        {renderInput("Hora Prevista", "scheduleTimeDeparture", "time", "", !enableDeparture, true)}
+                                        {renderInput("Data Partida", "dateDeparture", "date", "", !enableDeparture, true)}
                                     </div>
 
                                      {/* Departure POB */}

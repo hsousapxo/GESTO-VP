@@ -50,8 +50,8 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
 
     const getStatusIcon = (status: string) => {
         switch(status) {
-            case 'Realizado': return <CheckCircle className="w-3.5 h-3.5 text-blue-500" />;
-            case 'Confirmado': return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
+            case 'Realizado': return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
+            case 'Confirmado': return <CheckCircle className="w-3.5 h-3.5 text-blue-500" />;
             case 'Cancelado': return <XCircle className="w-3.5 h-3.5 text-red-500" />;
             case 'Arquivado': return <Archive className="w-3.5 h-3.5 text-purple-500" />;
             default: return <Clock className="w-3.5 h-3.5 text-yellow-500" />;
@@ -60,8 +60,8 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
 
     const getStatusClass = (status: string) => {
         switch(status) {
-            case 'Realizado': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
-            case 'Confirmado': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+            case 'Realizado': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
+            case 'Confirmado': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
             case 'Cancelado': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
             case 'Arquivado': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800';
             default: return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
