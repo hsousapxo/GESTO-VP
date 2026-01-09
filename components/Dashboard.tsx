@@ -43,7 +43,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onChangeView }) => {
                 
                 {/* Left Column (Span 2) - Calendar & Events */}
                 <div className="lg:col-span-2 flex flex-col gap-6">
-                    <WeekCalendarWidget />
+                    <WeekCalendarWidget onChangeView={onChangeView} />
                     <NextEventsWidget flights={flights} />
                 </div>
 
@@ -176,7 +176,7 @@ const getWeekNumber = (d: Date) => {
     return Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 };
 
-const WeekCalendarWidget: React.FC = () => {
+const WeekCalendarWidget: React.FC<{ onChangeView?: (view: ViewState) => void }> = ({ onChangeView }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const startOfWeek = getStartOfWeek(currentDate);
@@ -207,7 +207,7 @@ const WeekCalendarWidget: React.FC = () => {
         const hasAlert = !isToday && (d.getDate() % 5 === 0);
 
         return {
-            w: d.toLocaleDateString('pt-PT', { weekday: 'short' }).toUpperCase().replace('.', ''),
+            w: d.toLocaleDateString('pt-PT', { weekday: 'long' }).toUpperCase().replace('.', ''),
             d: d.getDate(),
             active: isToday,
             alert: hasAlert,
@@ -256,7 +256,11 @@ const WeekCalendarWidget: React.FC = () => {
             <div className="grid grid-cols-7 gap-2">
                 {days.map((day, idx) => {
                     return (
-                        <div key={idx} className="flex flex-col items-center gap-3 group cursor-pointer">
+                        <div 
+                            key={idx} 
+                            className="flex flex-col items-center gap-3 group cursor-pointer"
+                            onClick={() => onChangeView?.('calendar-monthly')}
+                        >
                             <span className={`text-[10px] font-bold tracking-wider ${day.isWeekend ? 'text-yellow-500' : 'text-gray-400'}`}>
                                 {day.w}
                             </span>

@@ -145,11 +145,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         isCollapsed={isCollapsed}
                     />
 
-                    {/* Relatórios Section (Moved Inside GS PF008) */}
+                    {/* Relatórios Modelos Section */}
                     {!isCollapsed && (
                         <div className="px-4 pt-3 pb-1">
                             <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Relatórios
+                                Relatórios Modelos
                             </span>
                         </div>
                     )}
