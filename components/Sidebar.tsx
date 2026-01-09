@@ -62,7 +62,9 @@ import {
     ExternalLink,
     Lock,
     ShieldCheck,
-    Plane
+    Plane,
+    Contact,
+    Send
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -276,14 +278,33 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                             isCollapsed={isCollapsed}
                             isSmall
                         />
-                        <MenuItem 
-                            icon={<Mail className="w-3.5 h-3.5" />} 
-                            label="Envio de Emails" 
-                            active={currentView === 'proc-emails'} 
-                            onClick={() => onChangeView('proc-emails')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
+                        {/* Envio de Emails as Folder */}
+                        <SubMenu label="Envio de Emails" icon={<Mail className="w-3.5 h-3.5" />} isCollapsed={isCollapsed}>
+                            <MenuItem 
+                                icon={<Send className="w-3 h-3" />} 
+                                label="Envio Email PULSAR" 
+                                active={currentView === 'email-pulsar'} 
+                                onClick={() => onChangeView('email-pulsar')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
+                            <MenuItem 
+                                icon={<Send className="w-3 h-3" />} 
+                                label="Envio Email RAMFA" 
+                                active={currentView === 'email-ramfa'} 
+                                onClick={() => onChangeView('email-ramfa')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
+                            <MenuItem 
+                                icon={<Send className="w-3 h-3" />} 
+                                label="ENVIO Email RELATÓRIO DE TURNO" 
+                                active={currentView === 'email-turno'} 
+                                onClick={() => onChangeView('email-turno')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
+                        </SubMenu>
                         <MenuItem 
                             icon={<ShieldAlert className="w-3.5 h-3.5" />} 
                             label="Interceções" 
@@ -340,6 +361,38 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                             label="Todos os SOPs" 
                             active={currentView === 'procedures'} 
                             onClick={() => onChangeView('procedures')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+                </MenuSection>
+
+                {/* Secção Contactos & Email */}
+                <MenuSection title="Contactos & Email" icon={<Mail className="w-4 h-4 text-green-500" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <MenuItem icon={<Users />} label="Contactos Internos" active={currentView === 'contacts'} onClick={() => onChangeView('contacts')} isCollapsed={isCollapsed} />
+                    {/* Envio de Emails as Folder */}
+                    <SubMenu label="Envio de Emails" icon={<Mail className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<Send className="w-3.5 h-3.5" />} 
+                            label="Envio Email PULSAR" 
+                            active={currentView === 'email-pulsar'} 
+                            onClick={() => onChangeView('email-pulsar')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Send className="w-3.5 h-3.5" />} 
+                            label="Envio Email RAMFA" 
+                            active={currentView === 'email-ramfa'} 
+                            onClick={() => onChangeView('email-ramfa')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Send className="w-3.5 h-3.5" />} 
+                            label="ENVIO Email RELATÓRIO DE TURNO" 
+                            active={currentView === 'email-turno'} 
+                            onClick={() => onChangeView('email-turno')} 
                             isCollapsed={isCollapsed}
                             isSmall
                         />

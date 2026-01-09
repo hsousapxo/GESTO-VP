@@ -22,6 +22,7 @@ import MonthlyStatisticsView from './components/MonthlyStatisticsView';
 import WeatherView from './components/clima/WeatherView';
 import WeatherAlertsView from './components/clima/WeatherAlertsView';
 import ContactsView from './components/ContactsView';
+import EmailReportView from './components/EmailReportView';
 import { ViewState, UserProfile, FlightFormData } from './types';
 import { 
     FileText, 
@@ -188,6 +189,9 @@ function App() {
             // Novos Procedimentos Operacionais
             case 'proc-menores': return <GenericReportPlaceholder title="Controlo de Menores" icon={<Baby className="w-10 h-10" />} />;
             case 'proc-emails': return <GenericReportPlaceholder title="Envio de Emails" icon={<Mail className="w-10 h-10" />} />;
+            case 'email-pulsar': return <EmailReportView type="pulsar" />;
+            case 'email-ramfa': return <EmailReportView type="ramfa" />;
+            case 'email-turno': return <EmailReportView type="turno" />;
             case 'proc-intercecoes': return <GenericReportPlaceholder title="Interceções" icon={<ShieldAlert className="w-10 h-10" />} />;
             case 'proc-cod-intercecao': return <GenericReportPlaceholder title="Códigos de Interceção" icon={<Hash className="w-10 h-10" />} />;
             case 'proc-extravio': return <GenericReportPlaceholder title="Extravio Passaporte" icon={<FileWarning className="w-10 h-10" />} />;
