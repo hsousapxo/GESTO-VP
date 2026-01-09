@@ -22,7 +22,19 @@ import WeatherView from './components/clima/WeatherView';
 import WeatherAlertsView from './components/clima/WeatherAlertsView';
 import ContactsView from './components/ContactsView';
 import { ViewState, UserProfile, FlightFormData } from './types';
-import { FileText, Download, Activity, Globe, FileSpreadsheet, Library, BookOpen } from 'lucide-react';
+import { 
+    FileText, 
+    Download, 
+    Activity, 
+    Globe, 
+    FileSpreadsheet, 
+    Library, 
+    BookOpen, 
+    ChevronRight, 
+    Flag, 
+    Lock, 
+    Search as SearchIcon 
+} from 'lucide-react';
 
 const GenericReportPlaceholder: React.FC<{ title: string, icon: React.ReactNode }> = ({ title, icon }) => (
     <div className="p-12 flex flex-col items-center justify-center h-full text-center">
@@ -38,35 +50,77 @@ const GenericReportPlaceholder: React.FC<{ title: string, icon: React.ReactNode 
     </div>
 );
 
-const LegalLibraryView: React.FC = () => (
-    <div className="p-12 max-w-5xl mx-auto">
-        <div className="flex items-center gap-4 mb-8">
-            <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-500 border border-blue-500/20">
-                <Library className="w-8 h-8" />
-            </div>
-            <div>
-                <h2 className="text-3xl font-bold text-white">Livraria Jurídica</h2>
-                <p className="text-gray-500">Doutrina, Jurisprudência e Manuais de Apoio à Decisão</p>
-            </div>
-        </div>
+const LegalLibraryView: React.FC = () => {
+    const categories = [
+        {
+            id: 'europeia',
+            title: 'Europeia',
+            docsCount: 5,
+            description: 'Legislação e tratados da União Europeia, incluindo regulamentos, diretivas e decisões que regulam o funcionamento da UE e os direitos dos cidadãos europeus.',
+            icon: <Globe className="w-6 h-6" />
+        },
+        {
+            id: 'nacional',
+            title: 'Nacional',
+            docsCount: 5,
+            description: 'Legislação portuguesa fundamental, incluindo a Constituição, códigos civis, penais e processuais que regulam o funcionamento da ordem jurídica nacional.',
+            icon: <Flag className="w-6 h-6" />
+        },
+        {
+            id: 'rgpd',
+            title: 'RGPD',
+            docsCount: 5,
+            description: 'Regulamento Geral de Proteção de Dados e legislação relacionada sobre privacidade, tratamento de dados pessoais e direitos dos titulares de dados.',
+            icon: <Lock className="w-6 h-6" />
+        },
+        {
+            id: 'aima',
+            title: 'AIMA',
+            docsCount: 5,
+            description: 'Agência para a Integração, Migrações e Asilo - Legislação sobre entrada, permanência e saída de estrangeiros, asilo e direitos dos migrantes.',
+            icon: <SearchIcon className="w-6 h-6" />
+        }
+    ];
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-[#131b2e] p-6 rounded-[24px] border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer group">
-                <BookOpen className="w-8 h-8 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-bold text-white mb-2">Manual de Direito de Fronteiras</h3>
-                <p className="text-sm text-gray-500 mb-6">Guia completo sobre a aplicação do Código de Fronteiras Schengen e legislação nacional.</p>
-                <button className="text-xs font-bold text-blue-400 flex items-center gap-2">LER DOCUMENTO <Download className="w-3 h-3" /></button>
+    return (
+        <div className="p-8 max-w-4xl mx-auto h-full overflow-y-auto custom-scrollbar">
+            <div className="mb-10">
+                <h1 className="text-3xl font-black text-white mb-2 uppercase tracking-tight">Legislação</h1>
+                <p className="text-gray-400 font-bold text-sm tracking-wide">Selecione uma categoria</p>
             </div>
-            
-            <div className="bg-[#131b2e] p-6 rounded-[24px] border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer group">
-                <FileText className="w-8 h-8 text-purple-400 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-bold text-white mb-2">Pareceres Jurídicos (DSAM)</h3>
-                <p className="text-sm text-gray-500 mb-6">Compilação de pareceres técnicos sobre casos complexos de inadmissibilidade e vistos.</p>
-                <button className="text-xs font-bold text-purple-400 flex items-center gap-2">ACEDER ARQUIVO <Download className="w-3 h-3" /></button>
+
+            <div className="flex flex-col gap-5">
+                {categories.map((cat) => (
+                    <div 
+                        key={cat.id} 
+                        className="bg-[#131b2e] p-6 rounded-[24px] border border-white/5 hover:border-blue-500/30 transition-all cursor-pointer group flex flex-col gap-4 shadow-xl"
+                    >
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-blue-600/10 rounded-xl flex items-center justify-center text-blue-500 border border-blue-500/20 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                    {cat.icon}
+                                </div>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white leading-none">{cat.title}</h3>
+                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mt-1 block">
+                                        {cat.docsCount} documentos
+                                    </span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-600 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
+                        </div>
+                        
+                        <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                            {cat.description}
+                        </p>
+                    </div>
+                ))}
             </div>
+
+            <div className="h-20"></div>
         </div>
-    </div>
-);
+    );
+};
 
 function App() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
