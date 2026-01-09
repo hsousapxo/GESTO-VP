@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Sun, Search, Plus, Bell, MessageCircle, ChevronDown, Moon } from 'lucide-react';
+import { Menu, Sun, Search, Plus, Bell, ChevronDown, Moon } from 'lucide-react';
 import { ViewState, UserProfile } from '../types';
 
 interface TopbarProps {
@@ -76,10 +76,6 @@ const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMo
                         </button>
                     )}
                     
-                    <button className="text-gray-400 hover:text-white transition-colors">
-                        <MessageCircle className="w-6 h-6 stroke-[1.5]" />
-                    </button>
-
                     <button className="text-gray-400 hover:text-white transition-colors">
                         <Search className="w-6 h-6 stroke-[1.5]" />
                     </button>

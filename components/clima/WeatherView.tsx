@@ -12,10 +12,26 @@ import {
     Globe, 
     Shield, 
     CloudSun, 
-    ArrowLeft
+    ArrowLeft,
+    Calendar,
+    Thermometer,
+    CloudRain,
+    Sun,
+    Droplets
 } from 'lucide-react';
 
-const WeatherView: React.FC = () => {
+interface WeatherViewProps {
+    airportCode?: 'PXO' | 'FNC';
+}
+
+const WeatherView: React.FC<WeatherViewProps> = ({ airportCode }) => {
+    
+    // If an airport is selected, show the Detailed 3-Day Forecast View
+    if (airportCode) {
+        return <DetailedForecast airportCode={airportCode} />;
+    }
+
+    // Default "Hub" View
     return (
         <div className="h-full bg-[#0a0e17] text-gray-100 p-6 overflow-y-auto">
             <div className="max-w-md mx-auto flex flex-col gap-6">
@@ -48,7 +64,7 @@ const WeatherView: React.FC = () => {
                 <div className="space-y-4">
                     
                     {/* FNC Card */}
-                    <div className="bg-[#131b2e] rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+                    <div className="bg-[#131b2e] rounded-3xl p-6 border border-white/5 relative overflow-hidden group cursor-pointer transition-colors hover:bg-[#1a2333]">
                         {/* Background Gradient Effect */}
                         <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-blue-600/20 transition-all"></div>
                         
@@ -85,7 +101,7 @@ const WeatherView: React.FC = () => {
                     </div>
 
                     {/* PXO Card */}
-                    <div className="bg-[#131b2e] rounded-3xl p-6 border border-white/5 relative overflow-hidden group">
+                    <div className="bg-[#131b2e] rounded-3xl p-6 border border-white/5 relative overflow-hidden group cursor-pointer transition-colors hover:bg-[#1a2333]">
                          {/* Background Gradient Effect */}
                          <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/5 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-green-500/10 transition-all"></div>
 
@@ -170,6 +186,90 @@ const WeatherView: React.FC = () => {
                 {/* Bottom Spacer for scrolling comfortably */}
                 <div className="h-4"></div>
             </div>
+        </div>
+    );
+};
+
+// --- Detailed Forecast Component ---
+
+const DetailedForecast: React.FC<{ airportCode: 'PXO' | 'FNC' }> = ({ airportCode }) => {
+    
+    const airportName = airportCode === 'PXO' ? 'Porto Santo' : 'Madeira (FNC)';
+    const nextDay = new Date();
+    nextDay.setDate(nextDay.getDate() + 2);
+    const dayName = nextDay.toLocaleDateString('pt-PT', { weekday: 'short' }).replace('.', '').charAt(0).toUpperCase() + nextDay.toLocaleDateString('pt-PT', { weekday: 'short' }).slice(1);
+
+    // Mock data based on airport
+    const data = airportCode === 'PXO' ? [
+        { label: 'Hoje', condition: 'PARCIALMENTE NUBLADO', icon: <CloudSun className="w-16 h-16 text-gray-400" />, max: '18°C', wind: '11 km/h', vis: '10km' },
+        { label: 'Amanhã', condition: 'PARCIALMENTE NUBLADO', icon: <CloudSun className="w-16 h-16 text-gray-400" />, max: '17°C', wind: '7 km/h', vis: '9km' },
+        { label: dayName, condition: 'CÉU LIMPO', icon: <Sun className="w-16 h-16 text-yellow-500" />, max: '18°C', wind: '9 km/h', vis: '>10km' },
+    ] : [
+        { label: 'Hoje', condition: 'CHUVA FRACA', icon: <CloudRain className="w-16 h-16 text-blue-400" />, max: '16°C', wind: '15 km/h', vis: '8km' },
+        { label: 'Amanhã', condition: 'AGUACEIROS', icon: <CloudRain className="w-16 h-16 text-blue-300" />, max: '17°C', wind: '12 km/h', vis: '9km' },
+        { label: dayName, condition: 'PARCIALMENTE NUBLADO', icon: <CloudSun className="w-16 h-16 text-gray-400" />, max: '19°C', wind: '8 km/h', vis: '>10km' },
+    ];
+
+    return (
+        <div className="h-full bg-[#0a0e17] text-gray-100 p-8 overflow-y-auto">
+             <div className="max-w-5xl mx-auto">
+                <div className="flex items-center gap-3 mb-6">
+                    <Calendar className="w-6 h-6 text-blue-500" />
+                    <h2 className="text-xl font-bold uppercase tracking-wide">PREVISÃO METEOROLÓGICA (3 DIAS) - <span className="text-blue-500">{airportName}</span></h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {data.map((day, idx) => (
+                        <div key={idx} className="bg-[#131b2e] rounded-3xl p-8 border border-white/5 flex flex-col items-center justify-between min-h-[400px] relative overflow-hidden group hover:bg-[#1a2333] transition-colors">
+                             {/* Glow Effect */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-blue-500/5 rounded-full blur-[60px] pointer-events-none group-hover:bg-blue-500/10 transition-all"></div>
+
+                            <div className="text-center z-10">
+                                <h3 className="text-2xl font-bold text-white mb-2">{day.label}</h3>
+                                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{day.condition}</p>
+                            </div>
+
+                            <div className="my-8 z-10 scale-125 transform transition-transform group-hover:scale-110">
+                                {day.icon}
+                            </div>
+
+                            <div className="w-full space-y-4 z-10">
+                                <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                                        <Thermometer className="w-4 h-4" />
+                                        <span>Max</span>
+                                    </div>
+                                    <span className="font-bold text-white text-lg">{day.max}</span>
+                                </div>
+                                <div className="flex justify-between items-center border-b border-white/5 pb-2">
+                                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                                        <Wind className="w-4 h-4" />
+                                        <span>Vento</span>
+                                    </div>
+                                    <span className="font-bold text-white">{day.wind}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center gap-2 text-gray-400 text-sm">
+                                        <Eye className="w-4 h-4" />
+                                        <span>Visibilidade</span>
+                                    </div>
+                                    <span className="font-bold text-white">{day.vis}</span>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                <div className="mt-8 bg-blue-900/10 rounded-xl p-4 border border-blue-900/30 flex items-start gap-3">
+                    <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                        <h4 className="font-bold text-blue-400 text-sm mb-1">Nota Operacional</h4>
+                        <p className="text-xs text-gray-400">
+                            A previsão meteorológica é baseada em dados TAF/METAR. Para operações críticas, consulte sempre os boletins oficiais aeronáuticos atualizados no momento.
+                        </p>
+                    </div>
+                </div>
+             </div>
         </div>
     );
 };

@@ -93,6 +93,10 @@ function App() {
                 return <AiImageEditor />;
             case 'weather':
                 return <WeatherView />;
+            case 'weather-pxo':
+                return <WeatherView airportCode="PXO" />;
+            case 'weather-fnc':
+                return <WeatherView airportCode="FNC" />;
             case 'templates':
                 return <TemplatesView />;
             case 'legislation':

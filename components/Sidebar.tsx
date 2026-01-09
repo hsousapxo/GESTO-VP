@@ -40,7 +40,9 @@ import {
     MonitorPlay,
     PanelLeftClose,
     PanelLeftOpen,
-    CloudSun
+    CloudSun,
+    PlaneTakeoff,
+    PlaneLanding
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -110,161 +112,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
 
             <div className="flex-1 overflow-y-auto py-5 custom-scrollbar h-[calc(100vh-81px)]">
                 
-                <MenuSection 
-                    title="Registo de Voos" 
-                    icon={<Briefcase className="w-4 h-4 text-red-500" />} 
-                    defaultOpen={true}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<Radar />} 
-                        label="Radar de Voos" 
-                        active={currentView === 'flight-tracker'}
-                        onClick={() => onChangeView('flight-tracker')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<PlusCircle />} 
-                        label="Novo Voo" 
-                        active={currentView === 'flight-form'}
-                        onClick={() => onChangeView('flight-form')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<List />} 
-                        label="Listar Aplicações" 
-                        active={currentView === 'flight-list'}
-                        onClick={() => onChangeView('flight-list')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Meteorologia" 
-                    icon={<CloudSun className="w-4 h-4 text-blue-300" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<CloudSun />} 
-                        label="Clima" 
-                        active={currentView === 'weather'}
-                        onClick={() => onChangeView('weather')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Estatísticas" 
-                    icon={<BarChart className="w-4 h-4 text-purple-400" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<PieChart />} 
-                        label="Painel Geral" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Relatórios" 
-                    icon={<ClipboardList className="w-4 h-4 text-green-400" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<FileText />} 
-                        label="Relatório Turno" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<LineChart />} 
-                        label="Relatório Semanal" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<BarChart />} 
-                        label="Relatório Mensal" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="PF008 IA" 
-                    icon={<Cpu className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<Bot />} 
-                        label="Chat" 
-                        active={currentView === 'ai-assistant'} 
-                        onClick={() => onChangeView('ai-assistant')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Camera />} 
-                        label="Captura / Upload Imagem" 
-                        active={currentView === 'ai-image-editor'}
-                        onClick={() => onChangeView('ai-image-editor')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Calendário" 
-                    icon={<Calendar className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<CalendarDays />} 
-                        label="Vista Mensal" 
-                        active={currentView === 'calendar-monthly'}
-                        onClick={() => onChangeView('calendar-monthly')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<CalendarRange />} 
-                        label="Vista Anual" 
-                        active={currentView === 'calendar-annual'}
-                        onClick={() => onChangeView('calendar-annual')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<BellRing />} 
-                        label="Lembretes" 
-                        active={currentView === 'reminders'}
-                        onClick={() => onChangeView('reminders')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
+                {/* GS PF008 - MOVED TO TOP */}
                 <MenuSection 
                     title="GS PF008" 
                     icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} 
-                    defaultOpen={false}
+                    defaultOpen={true}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
                     titleClassName="text-white font-bold"
@@ -291,7 +143,37 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         isCollapsed={isCollapsed}
                     />
 
-                    {/* Aplicações PF008 merged here */}
+                    {/* Relatórios Section (Moved Inside GS PF008) */}
+                    {!isCollapsed && (
+                        <div className="px-4 pt-3 pb-1">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                                Relatórios
+                            </span>
+                        </div>
+                    )}
+                    <MenuItem 
+                        icon={<FileText />} 
+                        label="Relatório Turno" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<LineChart />} 
+                        label="Relatório Semanal" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<BarChart />} 
+                        label="Relatório Mensal" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+
+                    {/* Aplicações PF008 */}
                     {!isCollapsed && (
                         <div className="px-4 pt-3 pb-1">
                             <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
@@ -342,7 +224,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         isCollapsed={isCollapsed}
                     />
 
-                    {/* Links PF008 merged here */}
+                    {/* Links PF008 */}
                     {!isCollapsed && (
                         <div className="px-4 pt-3 pb-1">
                             <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
@@ -358,6 +240,141 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     <MenuItem 
                         icon={<LinkIcon />} 
                         label="Link Externo 2" 
+                        isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Registo de Voos" 
+                    icon={<Briefcase className="w-4 h-4 text-red-500" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
+                >
+                    <MenuItem 
+                        icon={<Radar />} 
+                        label="Radar de Voos" 
+                        active={currentView === 'flight-tracker'}
+                        onClick={() => onChangeView('flight-tracker')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<PlusCircle />} 
+                        label="Novo Voo" 
+                        active={currentView === 'flight-form'}
+                        onClick={() => onChangeView('flight-form')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<List />} 
+                        label="Listar Aplicações" 
+                        active={currentView === 'flight-list'}
+                        onClick={() => onChangeView('flight-list')}
+                        isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Meteorologia" 
+                    icon={<CloudSun className="w-4 h-4 text-blue-300" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
+                >
+                    <MenuItem 
+                        icon={<CloudSun />} 
+                        label="Resumo" 
+                        active={currentView === 'weather'}
+                        onClick={() => onChangeView('weather')}
+                        isCollapsed={isCollapsed}
+                    />
+                     <MenuItem 
+                        icon={<PlaneTakeoff />} 
+                        label="PXO (Porto Santo)" 
+                        active={currentView === 'weather-pxo'}
+                        onClick={() => onChangeView('weather-pxo')}
+                        isCollapsed={isCollapsed}
+                    />
+                     <MenuItem 
+                        icon={<PlaneLanding />} 
+                        label="FNC (Madeira)" 
+                        active={currentView === 'weather-fnc'}
+                        onClick={() => onChangeView('weather-fnc')}
+                        isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Estatísticas" 
+                    icon={<BarChart className="w-4 h-4 text-purple-400" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
+                >
+                    <MenuItem 
+                        icon={<PieChart />} 
+                        label="Painel Geral" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                </MenuSection>
+
+                {/* PF008 Ask! Section */}
+                <MenuSection 
+                    title="PF008 Ask!" 
+                    icon={<Cpu className="w-4 h-4" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
+                >
+                    <MenuItem 
+                        icon={<Bot />} 
+                        label="Chat" 
+                        active={currentView === 'ai-assistant'} 
+                        onClick={() => onChangeView('ai-assistant')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Camera />} 
+                        label="Captura / Upload Imagem" 
+                        active={currentView === 'ai-image-editor'}
+                        onClick={() => onChangeView('ai-image-editor')}
+                        isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Calendário" 
+                    icon={<Calendar className="w-4 h-4" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
+                >
+                    <MenuItem 
+                        icon={<CalendarDays />} 
+                        label="Vista Mensal" 
+                        active={currentView === 'calendar-monthly'}
+                        onClick={() => onChangeView('calendar-monthly')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<CalendarRange />} 
+                        label="Vista Anual" 
+                        active={currentView === 'calendar-annual'}
+                        onClick={() => onChangeView('calendar-annual')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<BellRing />} 
+                        label="Lembretes" 
+                        active={currentView === 'reminders'}
+                        onClick={() => onChangeView('reminders')}
                         isCollapsed={isCollapsed}
                     />
                 </MenuSection>
