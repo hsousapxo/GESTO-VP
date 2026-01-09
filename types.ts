@@ -5,7 +5,7 @@ export enum FlightType {
     TURNAROUND = 'escala'
 }
 
-export type FlightStatus = 'Agendado' | 'Confirmado' | 'Realizado' | 'Cancelado';
+export type FlightStatus = 'Agendado' | 'Confirmado' | 'Realizado' | 'Cancelado' | 'Arquivado';
 
 export type FlightNature = 
     | 'Voo Privado' 

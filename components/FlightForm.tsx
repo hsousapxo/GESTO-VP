@@ -357,6 +357,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
             case 'Realizado': return 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-800';
             case 'Cancelado': return 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 border-red-100 dark:border-red-800';
             case 'Confirmado': return 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-100 dark:border-green-800';
+            case 'Arquivado': return 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-800';
             default: return 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-100 dark:border-yellow-800';
         }
     };
@@ -405,6 +406,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                         formData.status === 'Confirmado' ? 'bg-green-500/20 text-green-400' :
                                         formData.status === 'Realizado' ? 'bg-blue-500/20 text-blue-400' :
                                         formData.status === 'Cancelado' ? 'bg-red-500/20 text-red-400' :
+                                        formData.status === 'Arquivado' ? 'bg-purple-500/20 text-purple-400' :
                                         'bg-yellow-500/20 text-yellow-400'
                                     }`}>
                                         {formData.status}
@@ -625,6 +627,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                         formData.status === 'Realizado' ? 'bg-blue-50 text-blue-700 border-blue-300' :
                                         formData.status === 'Confirmado' ? 'bg-green-50 text-green-700 border-green-300' :
                                         formData.status === 'Cancelado' ? 'bg-red-50 text-red-700 border-red-300' :
+                                        formData.status === 'Arquivado' ? 'bg-purple-50 text-purple-700 border-purple-300' :
                                         'bg-yellow-50 text-yellow-700 border-yellow-300'
                                     }`}
                                     value={formData.status}
@@ -634,6 +637,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     <option value="Confirmado">Confirmado</option>
                                     <option value="Realizado">Realizado</option>
                                     <option value="Cancelado">Cancelado</option>
+                                    <option value="Arquivado">Arquivado</option>
                                 </select>
                             </div>
 

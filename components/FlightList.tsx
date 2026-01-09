@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Plane, Calendar, Users, Trash2, ArrowRight, ArrowLeftRight, CheckCircle, Clock, XCircle, Info, Printer, Eye, Edit, PlaneLanding, PlaneTakeoff, Hash, Archive, Globe, Ban } from 'lucide-react';
-import { getFlights, deleteFlight } from '../services/db';
+import { getFlights, deleteFlight, saveFlight } from '../services/db';
 import { FlightFormData, FlightType } from '../types';
 
 interface FlightListProps {
@@ -37,10 +37,14 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
 
     const handleArchive = async (flight: FlightFormData) => {
         if (window.confirm(`Deseja arquivar o voo ${flight.flightNumber}?`)) {
-            // Placeholder for archive logic. In a real app, this might update a 'archived' boolean flag.
-            // For now, we'll log it.
-            console.log("Arquivar voo:", flight.id);
-            alert("Funcionalidade de arquivo simulada: Voo marcado para arquivo.");
+            try {
+                // Update status to 'Arquivado'
+                await saveFlight({ ...flight, status: 'Arquivado' });
+                loadData(); // Refresh list
+            } catch (error) {
+                console.error("Error archiving flight", error);
+                alert("Erro ao arquivar o voo.");
+            }
         }
     };
 
@@ -49,6 +53,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
             case 'Realizado': return <CheckCircle className="w-3.5 h-3.5 text-blue-500" />;
             case 'Confirmado': return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
             case 'Cancelado': return <XCircle className="w-3.5 h-3.5 text-red-500" />;
+            case 'Arquivado': return <Archive className="w-3.5 h-3.5 text-purple-500" />;
             default: return <Clock className="w-3.5 h-3.5 text-yellow-500" />;
         }
     };
@@ -58,6 +63,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
             case 'Realizado': return 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800';
             case 'Confirmado': return 'text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800';
             case 'Cancelado': return 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800';
+            case 'Arquivado': return 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800';
             default: return 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-800';
         }
     };
@@ -76,7 +82,9 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                         </div>
                         <span className="font-bold text-gray-900 dark:text-gray-100">{flight.origin}</span>
                         <ArrowRight className="w-3 h-3 text-gray-300 dark:text-gray-600" />
-                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">LPPS</span>
+                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
+                            LPPS <span className="text-gray-400 dark:text-gray-500 font-mono">({flight.scheduleTimeArrival})</span>
+                        </span>
                     </div>
                 )}
 
@@ -86,7 +94,9 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                          <div className="p-1 rounded bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
                              <PlaneTakeoff className="w-3.5 h-3.5" />
                         </div>
-                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">LPPS</span>
+                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">
+                            LPPS <span className="text-gray-400 dark:text-gray-500 font-mono">({flight.scheduleTimeDeparture})</span>
+                        </span>
                         <ArrowRight className="w-3 h-3 text-gray-300 dark:text-gray-600" />
                         <span className="font-bold text-gray-900 dark:text-gray-100">{flight.destination}</span>
                     </div>
@@ -261,25 +271,24 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                             <table className="w-full text-left">
                                 <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
-                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Voo / Data</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Natureza / Rota</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Registos (Gesdoc/Int)</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Passageiros (Por Percurso)</th>
-                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Ações</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">VOO / STATUS</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">NATUREZA / ROTA</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">REGISTOS VP</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">PASSAGEIROS</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">AÇÕES</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {flights.map((flight) => {
-                                        // Determine relevant date/time to show
+                                        // Determine relevant date to show
                                         const dateTime = flight.flightType === FlightType.DEPARTURE ? 
-                                            `${flight.dateDeparture || ''} ${flight.scheduleTimeDeparture || ''}` : 
-                                            `${flight.dateArrival || ''} ${flight.scheduleTimeArrival || ''}`;
+                                            flight.dateDeparture : flight.dateArrival;
                                         
-                                        const dateObj = new Date(dateTime.trim() || flight.createdAt || Date.now());
+                                        const dateObj = new Date(dateTime || flight.createdAt || Date.now());
 
                                         return (
                                         <tr key={flight.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                            {/* Col 1: Voo / Status / Data */}
+                                            {/* Col 1: VOO / STATUS */}
                                             <td className="px-4 py-3 align-top">
                                                 <div className="flex flex-col gap-1">
                                                     <div className="flex items-center gap-2">
@@ -293,13 +302,11 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                                                     <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                         <Calendar className="w-3 h-3" />
                                                         <span>{dateObj.toLocaleDateString('pt-PT')}</span>
-                                                        <Clock className="w-3 h-3 ml-1" />
-                                                        <span>{dateObj.toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit'})}</span>
                                                     </div>
                                                 </div>
                                             </td>
 
-                                            {/* Col 2: Natureza / Rota */}
+                                            {/* Col 2: NATUREZA / ROTA */}
                                             <td className="px-4 py-3 align-top">
                                                 <div className="mb-2">
                                                     <span className="text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
@@ -309,7 +316,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                                                 {getRouteDisplay(flight)}
                                             </td>
 
-                                            {/* Col 3: Registos */}
+                                            {/* Col 3: REGISTOS VP */}
                                             <td className="px-4 py-3 align-top">
                                                 <div className="flex flex-col gap-2">
                                                     {/* Gesdoc */}
@@ -323,13 +330,13 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                                                     {/* Internal Registries */}
                                                     <div className="flex flex-col gap-1">
                                                         {flight.regVPArrival && (
-                                                            <div className="text-[10px] text-blue-700 dark:text-blue-400 font-medium">
-                                                                PF008 Che: <b>{flight.regVPArrival}</b>
+                                                            <div className="text-[10px] text-blue-700 dark:text-blue-400 font-medium bg-blue-50 dark:bg-blue-900/20 px-1.5 py-0.5 rounded border border-blue-200 dark:border-blue-800 w-fit">
+                                                                VP Che: <b>{flight.regVPArrival}</b>
                                                             </div>
                                                         )}
                                                         {flight.regVPDeparture && (
-                                                             <div className="text-[10px] text-orange-700 dark:text-orange-400 font-medium">
-                                                                PF008 Par: <b>{flight.regVPDeparture}</b>
+                                                             <div className="text-[10px] text-orange-700 dark:text-orange-400 font-medium bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded border border-orange-200 dark:border-orange-800 w-fit">
+                                                                VP Par: <b>{flight.regVPDeparture}</b>
                                                             </div>
                                                         )}
                                                         {!flight.regVPArrival && !flight.regVPDeparture && (
@@ -339,12 +346,12 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                                                 </div>
                                             </td>
 
-                                            {/* Col 4: Passageiros (Per Leg) */}
+                                            {/* Col 4: PASSAGEIROS */}
                                             <td className="px-4 py-3 align-top">
                                                 {getPaxDisplay(flight)}
                                             </td>
 
-                                            {/* Col 5: Ações */}
+                                            {/* Col 5: AÇÕES */}
                                             <td className="px-4 py-3 align-middle text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <button 
