@@ -43,7 +43,8 @@ import {
     CloudSun,
     PlaneTakeoff,
     PlaneLanding,
-    Archive
+    Archive,
+    BarChart3
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -162,15 +163,15 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     <MenuItem 
                         icon={<LineChart />} 
                         label="Relatório Semanal" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
+                        active={currentView === 'statistics-weekly'} 
+                        onClick={() => onChangeView('statistics-weekly')} 
                         isCollapsed={isCollapsed} 
                     />
                     <MenuItem 
                         icon={<BarChart />} 
                         label="Relatório Mensal" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
+                        active={currentView === 'statistics-monthly'} 
+                        onClick={() => onChangeView('statistics-monthly')} 
                         isCollapsed={isCollapsed} 
                     />
 
@@ -327,6 +328,20 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         label="Painel Geral" 
                         active={currentView === 'statistics'} 
                         onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<BarChart3 />} 
+                        label="Painel Semanal" 
+                        active={currentView === 'statistics-weekly'} 
+                        onClick={() => onChangeView('statistics-weekly')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<LineChart />} 
+                        label="Painel Mensal" 
+                        active={currentView === 'statistics-monthly'} 
+                        onClick={() => onChangeView('statistics-monthly')} 
                         isCollapsed={isCollapsed} 
                     />
                 </MenuSection>

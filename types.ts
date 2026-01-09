@@ -83,6 +83,8 @@ export type ViewState =
     | 'flight-archive'
     | 'flight-tracker' 
     | 'statistics'
+    | 'statistics-weekly'
+    | 'statistics-monthly'
     | 'weather'
     | 'weather-pxo'
     | 'weather-fnc'

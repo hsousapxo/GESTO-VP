@@ -15,6 +15,8 @@ import CalendarAnnualView from './components/CalendarAnnualView';
 import RemindersView from './components/RemindersView';
 import FlightTracker from './components/FlightTracker';
 import StatisticsView from './components/StatisticsView';
+import WeeklyStatisticsView from './components/WeeklyStatisticsView';
+import MonthlyStatisticsView from './components/MonthlyStatisticsView';
 import WeatherView from './components/clima/WeatherView';
 import { ViewState, UserProfile, FlightFormData } from './types';
 
@@ -89,6 +91,10 @@ function App() {
                 return <FlightTracker />;
             case 'statistics':
                 return <StatisticsView />;
+            case 'statistics-weekly':
+                return <WeeklyStatisticsView />;
+            case 'statistics-monthly':
+                return <MonthlyStatisticsView />;
             case 'ai-assistant':
                 return <AiAssistant />;
             case 'ai-image-editor':
