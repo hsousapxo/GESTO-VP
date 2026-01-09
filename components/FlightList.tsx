@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plane, Calendar, Users, Trash2, ArrowRight, ArrowLeftRight, CheckCircle, Clock, XCircle, Info, Printer, Eye, Edit, PlaneLanding, PlaneTakeoff } from 'lucide-react';
+import { Plane, Calendar, Users, Trash2, ArrowRight, ArrowLeftRight, CheckCircle, Clock, XCircle, Info, Printer, Eye, Edit, PlaneLanding, PlaneTakeoff, Hash, Archive, Globe, Ban } from 'lucide-react';
 import { getFlights, deleteFlight } from '../services/db';
 import { FlightFormData, FlightType } from '../types';
 
@@ -29,18 +29,27 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
     }, []);
 
     const handleDelete = async (id: string) => {
-        if (window.confirm("Tem certeza que deseja apagar este registo?")) {
+        if (window.confirm("Tem certeza que deseja apagar este registo permanentemente?")) {
             await deleteFlight(id);
             loadData();
         }
     };
 
+    const handleArchive = async (flight: FlightFormData) => {
+        if (window.confirm(`Deseja arquivar o voo ${flight.flightNumber}?`)) {
+            // Placeholder for archive logic. In a real app, this might update a 'archived' boolean flag.
+            // For now, we'll log it.
+            console.log("Arquivar voo:", flight.id);
+            alert("Funcionalidade de arquivo simulada: Voo marcado para arquivo.");
+        }
+    };
+
     const getStatusIcon = (status: string) => {
         switch(status) {
-            case 'Realizado': return <CheckCircle className="w-4 h-4 text-blue-500" />;
-            case 'Confirmado': return <CheckCircle className="w-4 h-4 text-green-500" />;
-            case 'Cancelado': return <XCircle className="w-4 h-4 text-red-500" />;
-            default: return <Clock className="w-4 h-4 text-yellow-500" />;
+            case 'Realizado': return <CheckCircle className="w-3.5 h-3.5 text-blue-500" />;
+            case 'Confirmado': return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
+            case 'Cancelado': return <XCircle className="w-3.5 h-3.5 text-red-500" />;
+            default: return <Clock className="w-3.5 h-3.5 text-yellow-500" />;
         }
     };
 
@@ -58,52 +67,72 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
         const isDep = flight.flightType === FlightType.DEPARTURE || flight.flightType === FlightType.TURNAROUND;
 
         return (
-            <div className="flex flex-col gap-3 min-w-[240px] py-1">
+            <div className="flex flex-col gap-2 min-w-[200px]">
                 {/* Line 1: Arrival (Chegada) */}
-                <div className={`flex items-center gap-3 ${isArr ? '' : 'opacity-25 grayscale'}`}>
-                    <div className={`p-1.5 rounded flex-shrink-0 ${isArr ? 'bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
-                        <PlaneLanding className="w-4 h-4" />
-                    </div>
+                {isArr && (
                     <div className="flex items-center gap-2 text-sm">
-                        {isArr ? (
-                            <>
-                                <span className="font-bold text-gray-900 dark:text-gray-100">{flight.origin}</span>
-                                <span className="text-gray-500 dark:text-gray-400 text-xs font-mono">({flight.scheduleTimeArrival})</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600" />
-                                <span className="text-gray-500 dark:text-gray-400 font-medium">LPPS</span>
-                            </>
-                        ) : (
-                            <span className="text-gray-400 text-xs italic">---</span>
-                        )}
+                        <div className="p-1 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                             <PlaneLanding className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="font-bold text-gray-900 dark:text-gray-100">{flight.origin}</span>
+                        <ArrowRight className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">LPPS</span>
                     </div>
-                </div>
+                )}
 
                 {/* Line 2: Departure (Partida) */}
-                <div className={`flex items-center gap-3 ${isDep ? '' : 'opacity-25 grayscale'}`}>
-                     <div className={`p-1.5 rounded flex-shrink-0 ${isDep ? 'bg-orange-100 dark:bg-orange-500/20 text-orange-700 dark:text-orange-300' : 'bg-gray-100 dark:bg-gray-800 text-gray-400'}`}>
-                         <PlaneTakeoff className="w-4 h-4" />
-                    </div>
+                {isDep && (
                     <div className="flex items-center gap-2 text-sm">
-                        {isDep ? (
-                            <>
-                                <span className="text-gray-500 dark:text-gray-400 font-medium">LPPS</span>
-                                <ArrowRight className="w-3.5 h-3.5 text-gray-300 dark:text-gray-600" />
-                                <span className="font-bold text-gray-900 dark:text-gray-100">{flight.destination}</span>
-                                <span className="text-gray-500 dark:text-gray-400 text-xs font-mono">({flight.scheduleTimeDeparture})</span>
-                            </>
-                        ) : (
-                            <span className="text-gray-400 text-xs italic">---</span>
-                        )}
+                         <div className="p-1 rounded bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400">
+                             <PlaneTakeoff className="w-3.5 h-3.5" />
+                        </div>
+                        <span className="text-gray-500 dark:text-gray-400 font-medium text-xs">LPPS</span>
+                        <ArrowRight className="w-3 h-3 text-gray-300 dark:text-gray-600" />
+                        <span className="font-bold text-gray-900 dark:text-gray-100">{flight.destination}</span>
                     </div>
+                )}
+            </div>
+        );
+    };
+
+    const getPaxDisplay = (flight: FlightFormData) => {
+        const isArr = flight.flightType === FlightType.ARRIVAL || flight.flightType === FlightType.TURNAROUND;
+        const isDep = flight.flightType === FlightType.DEPARTURE || flight.flightType === FlightType.TURNAROUND;
+
+        const renderLegPax = (type: 'Arr' | 'Dep') => {
+            const total = type === 'Arr' 
+                ? (flight.arrivalUeCount || 0) + (flight.arrivalNonSchengenCount || 0) + (flight.arrivalCrewCount || 0)
+                : (flight.departureUeCount || 0) + (flight.departureNonSchengenCount || 0) + (flight.departureCrewCount || 0);
+            
+            const ue = type === 'Arr' ? flight.arrivalUeCount : flight.departureUeCount;
+            const ce = type === 'Arr' ? flight.arrivalNonSchengenCount : flight.departureNonSchengenCount;
+
+            return (
+                <div className="flex items-center gap-2 text-xs">
+                     <span className={`font-bold w-8 ${type === 'Arr' ? 'text-blue-600 dark:text-blue-400' : 'text-orange-600 dark:text-orange-400'}`}>
+                        {type === 'Arr' ? 'Che:' : 'Par:'}
+                     </span>
+                     <div className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-700 dark:text-gray-300 font-bold min-w-[24px] text-center">
+                        {total}
+                     </div>
+                     <div className="flex gap-1.5 text-[10px] text-gray-500 dark:text-gray-400 ml-1">
+                        <span className="flex items-center gap-0.5"><Globe className="w-2.5 h-2.5" /> {ue || 0}</span>
+                        <span className="flex items-center gap-0.5"><Ban className="w-2.5 h-2.5" /> {ce || 0}</span>
+                     </div>
                 </div>
+            );
+        };
+
+        return (
+            <div className="flex flex-col gap-1.5">
+                {isArr && renderLegPax('Arr')}
+                {isDep && renderLegPax('Dep')}
             </div>
         );
     };
 
     const getPaxSummary = (flight: FlightFormData) => {
         let ue = 0, nonSchengen = 0, crew = 0;
-        
-        // Sum based on available legs
         if (flight.flightType === FlightType.ARRIVAL || flight.flightType === FlightType.TURNAROUND) {
             ue += flight.arrivalUeCount || 0;
             nonSchengen += flight.arrivalNonSchengenCount || 0;
@@ -114,15 +143,12 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
             nonSchengen += flight.departureNonSchengenCount || 0;
             crew += flight.departureCrewCount || 0;
         }
-
         return { ue, nonSchengen, crew, total: ue + nonSchengen + crew };
     };
 
-    // Statistics Calculation (Only 'Realizado' counts)
     const realizedFlights = flights.filter(f => f.status === 'Realizado');
     const totalFlights = realizedFlights.length;
     
-    // Calculate totals summing both legs where applicable
     const totalPaxUE = realizedFlights.reduce((acc, f) => {
         const stats = getPaxSummary(f);
         return acc + stats.ue;
@@ -144,7 +170,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
 
     return (
         <div className="p-6 relative">
-            {/* VIEW MODAL */}
+            {/* VIEW MODAL (Detail View) */}
             {viewFlight && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 dark:border-gray-700">
@@ -169,8 +195,8 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                                     {getRouteDisplay(viewFlight)}
                                 </div>
                                 <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Aeronave</span>
-                                    <span className="block text-gray-800 dark:text-gray-200">{viewFlight.aircraftType}</span>
+                                    <span className="block text-gray-400 text-xs uppercase font-bold">Gesdoc</span>
+                                    <span className="block text-gray-800 dark:text-gray-200 font-bold">{viewFlight.gesdocNumber || '--'}/{viewFlight.gesdocYear}</span>
                                 </div>
                                 <div>
                                     <span className="block text-gray-400 text-xs uppercase font-bold">Total POB</span>
@@ -198,7 +224,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                 </div>
             )}
 
-            <div className="max-w-6xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
                     <h2 className="text-2xl font-bold text-primary dark:text-blue-400">{title}</h2>
                     
@@ -223,12 +249,6 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                     </div>
                 </div>
 
-                {/* Info Note */}
-                <div className="mb-4 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 bg-blue-50 dark:bg-blue-900/10 p-2 rounded border border-blue-100 dark:border-blue-900/30">
-                    <Info className="w-4 h-4 text-blue-500" />
-                    <span>Apenas voos com estado <b>"Realizado"</b> contabilizam para as estatísticas de passageiros.</span>
-                </div>
-
                 {flights.length === 0 ? (
                     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-12 text-center border border-gray-100 dark:border-gray-700 transition-colors">
                         <Plane className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
@@ -241,103 +261,123 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
                             <table className="w-full text-left">
                                 <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Voo / Status</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Natureza / Rota</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Registos VP</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-center">Passageiros</th>
-                                        <th className="px-6 py-4 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Ações</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Voo / Data</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Natureza / Rota</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Registos (Gesdoc/Int)</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Passageiros (Por Percurso)</th>
+                                        <th className="px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider text-right">Ações</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {flights.map((flight) => {
-                                        const stats = getPaxSummary(flight);
+                                        // Determine relevant date/time to show
+                                        const dateTime = flight.flightType === FlightType.DEPARTURE ? 
+                                            `${flight.dateDeparture || ''} ${flight.scheduleTimeDeparture || ''}` : 
+                                            `${flight.dateArrival || ''} ${flight.scheduleTimeArrival || ''}`;
+                                        
+                                        const dateObj = new Date(dateTime.trim() || flight.createdAt || Date.now());
+
                                         return (
                                         <tr key={flight.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors">
-                                            <td className="px-6 py-4 align-top">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="bg-blue-50 dark:bg-blue-900/30 p-2 rounded text-primary dark:text-blue-400">
-                                                        {flight.flightType === FlightType.TURNAROUND ? <ArrowLeftRight className="w-5 h-5" /> : <Plane className="w-5 h-5" />}
+                                            {/* Col 1: Voo / Status / Data */}
+                                            <td className="px-4 py-3 align-top">
+                                                <div className="flex flex-col gap-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <Plane className="w-4 h-4 text-gray-400" />
+                                                        <span className="font-bold text-gray-900 dark:text-gray-100 text-base">{flight.flightNumber}</span>
                                                     </div>
-                                                    <div>
-                                                        <div className="font-bold text-gray-900 dark:text-gray-100 text-lg">
-                                                            {flight.flightNumber}
-                                                        </div>
-                                                        <div className={`text-xs font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 mt-1 border ${getStatusClass(flight.status)}`}>
-                                                            {getStatusIcon(flight.status)}
-                                                            {flight.status}
-                                                        </div>
-                                                        <div className="text-[10px] text-gray-400 mt-1">
-                                                            {new Date(flight.createdAt || '').toLocaleDateString('pt-PT')}
-                                                        </div>
+                                                    <div className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-1 w-fit border ${getStatusClass(flight.status)}`}>
+                                                        {getStatusIcon(flight.status)}
+                                                        {flight.status}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                        <Calendar className="w-3 h-3" />
+                                                        <span>{dateObj.toLocaleDateString('pt-PT')}</span>
+                                                        <Clock className="w-3 h-3 ml-1" />
+                                                        <span>{dateObj.toLocaleTimeString('pt-PT', {hour: '2-digit', minute:'2-digit'})}</span>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 align-top">
+
+                                            {/* Col 2: Natureza / Rota */}
+                                            <td className="px-4 py-3 align-top">
                                                 <div className="mb-2">
-                                                    <span className="text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300">
+                                                    <span className="text-[10px] font-bold uppercase tracking-wider bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
                                                         {flight.flightNature || 'N/A'}
                                                     </span>
                                                 </div>
                                                 {getRouteDisplay(flight)}
                                             </td>
-                                            <td className="px-6 py-4 align-top">
-                                                <div className="flex flex-col gap-1 text-xs text-gray-600 dark:text-gray-400">
-                                                    {flight.regVPArrival && (
-                                                        <span className="bg-blue-50 dark:bg-blue-900/20 px-1 rounded text-blue-700 dark:text-blue-300 border border-blue-100 dark:border-blue-800">
-                                                            VP Che: {flight.regVPArrival}
+
+                                            {/* Col 3: Registos */}
+                                            <td className="px-4 py-3 align-top">
+                                                <div className="flex flex-col gap-2">
+                                                    {/* Gesdoc */}
+                                                    <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/10 px-2 py-1 rounded border border-yellow-100 dark:border-yellow-800/30 w-fit">
+                                                        <Hash className="w-3 h-3 text-yellow-600 dark:text-yellow-500" />
+                                                        <span className="text-xs font-bold text-gray-800 dark:text-gray-200">
+                                                            {flight.gesdocNumber ? `${flight.gesdocNumber}/${flight.gesdocYear}` : '---'}
                                                         </span>
-                                                    )}
-                                                    {flight.regVPDeparture && (
-                                                        <span className="bg-orange-50 dark:bg-orange-900/20 px-1 rounded text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800">
-                                                            VP Par: {flight.regVPDeparture}
-                                                        </span>
-                                                    )}
-                                                    {!flight.regVPArrival && !flight.regVPDeparture && (
-                                                        <span className="text-gray-400 italic">Sem registo</span>
-                                                    )}
+                                                    </div>
+                                                    
+                                                    {/* Internal Registries */}
+                                                    <div className="flex flex-col gap-1">
+                                                        {flight.regVPArrival && (
+                                                            <div className="text-[10px] text-blue-700 dark:text-blue-400 font-medium">
+                                                                PF008 Che: <b>{flight.regVPArrival}</b>
+                                                            </div>
+                                                        )}
+                                                        {flight.regVPDeparture && (
+                                                             <div className="text-[10px] text-orange-700 dark:text-orange-400 font-medium">
+                                                                PF008 Par: <b>{flight.regVPDeparture}</b>
+                                                            </div>
+                                                        )}
+                                                        {!flight.regVPArrival && !flight.regVPDeparture && (
+                                                            <span className="text-[10px] text-gray-400 italic">Sem registo interno</span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 align-top text-center">
-                                                <div className="inline-flex items-center gap-1.5 bg-gray-100 dark:bg-gray-700 px-2.5 py-1 rounded-full mb-1">
-                                                    <Users className="w-3.5 h-3.5 text-gray-500 dark:text-gray-400" />
-                                                    <span className="text-sm font-bold text-primary dark:text-blue-400">
-                                                        {stats.total}
-                                                    </span>
-                                                </div>
-                                                <div className="text-[10px] text-gray-500 dark:text-gray-400 flex justify-center gap-2">
-                                                    <span>UE: <b>{stats.ue}</b></span>
-                                                    <span>CE: <b>{stats.nonSchengen}</b></span>
-                                                </div>
-                                                {flight.status !== 'Realizado' && (
-                                                    <span className="text-[9px] text-gray-400 italic block mt-1">(Não contabilizado)</span>
-                                                )}
+
+                                            {/* Col 4: Passageiros (Per Leg) */}
+                                            <td className="px-4 py-3 align-top">
+                                                {getPaxDisplay(flight)}
                                             </td>
-                                            <td className="px-6 py-4 align-middle text-right">
-                                                <div className="flex items-center justify-end gap-2">
+
+                                            {/* Col 5: Ações */}
+                                            <td className="px-4 py-3 align-middle text-right">
+                                                <div className="flex items-center justify-end gap-1">
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); window.print(); }}
-                                                        className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-2 rounded-lg transition-all border border-transparent hover:border-blue-100 dark:hover:border-blue-800"
+                                                        className="text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 p-1.5 rounded-lg transition-all"
                                                         title="Imprimir"
                                                     >
                                                         <Printer className="w-4 h-4" />
                                                     </button>
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); setViewFlight(flight); }}
-                                                        className="text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 p-2 rounded-lg transition-all border border-transparent hover:border-green-100 dark:hover:border-green-800"
+                                                        className="text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 p-1.5 rounded-lg transition-all"
                                                         title="Ver Detalhes"
                                                     >
                                                         <Eye className="w-4 h-4" />
                                                     </button>
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); if(onEdit) onEdit(flight); }}
-                                                        className="text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 p-2 rounded-lg transition-all border border-transparent hover:border-orange-100 dark:hover:border-orange-800"
+                                                        className="text-gray-400 hover:text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/20 p-1.5 rounded-lg transition-all"
                                                         title="Editar"
                                                     >
                                                         <Edit className="w-4 h-4" />
                                                     </button>
+                                                     <button 
+                                                        onClick={(e) => { e.stopPropagation(); handleArchive(flight); }}
+                                                        className="text-gray-400 hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20 p-1.5 rounded-lg transition-all"
+                                                        title="Arquivar"
+                                                    >
+                                                        <Archive className="w-4 h-4" />
+                                                    </button>
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); if(flight.id) handleDelete(flight.id); }}
-                                                        className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all border border-transparent hover:border-red-100 dark:hover:border-red-800"
+                                                        className="text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 p-1.5 rounded-lg transition-all"
                                                         title="Eliminar"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
