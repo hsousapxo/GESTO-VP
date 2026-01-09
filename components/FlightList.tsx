@@ -157,7 +157,11 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
     };
 
     const realizedFlights = flights.filter(f => f.status === 'Realizado');
-    const totalFlights = realizedFlights.length;
+    
+    // Count Movements (Flights): Escala = 2, Others = 1
+    const totalFlights = realizedFlights.reduce((acc, f) => {
+        return acc + (f.flightType === FlightType.TURNAROUND ? 2 : 1);
+    }, 0);
     
     const totalPaxUE = realizedFlights.reduce((acc, f) => {
         const stats = getPaxSummary(f);

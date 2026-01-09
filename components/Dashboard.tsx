@@ -84,12 +84,20 @@ const MonthlySummaryFooter: React.FC<{ flights: FlightFormData[] }> = ({ flights
         return fDate.getMonth() === currentMonth && fDate.getFullYear() === currentYear;
     });
 
-    let totalFlights = monthlyFlights.length;
+    let totalFlights = 0;
     let totalPaxUE = 0;
     let totalPaxExtra = 0;
     let totalCrew = 0;
 
     monthlyFlights.forEach(f => {
+        // Calculate Movements (Flights)
+        // Escala counts as 2 flights (Arrival + Departure), others count as 1
+        if (f.flightType === FlightType.TURNAROUND) {
+            totalFlights += 2;
+        } else {
+            totalFlights += 1;
+        }
+
         // Arrival Logic
         if (f.flightType === FlightType.ARRIVAL || f.flightType === FlightType.TURNAROUND) {
             totalPaxUE += f.arrivalUeCount || 0;
@@ -159,7 +167,6 @@ const MonthlySummaryFooter: React.FC<{ flights: FlightFormData[] }> = ({ flights
 
 // --- Widget: Week Calendar (Functional Logic) ---
 
-// Helpers for date manipulation
 const getStartOfWeek = (date: Date) => {
     const d = new Date(date);
     const day = d.getDay();
