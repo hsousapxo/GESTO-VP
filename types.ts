@@ -80,6 +80,7 @@ export type ViewState =
     | 'ai-image-editor' 
     | 'flight-form' 
     | 'flight-list'
+    | 'flight-archive'
     | 'flight-tracker' 
     | 'statistics'
     | 'weather'

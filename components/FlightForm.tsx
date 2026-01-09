@@ -329,7 +329,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
             <input 
-                type={type}
+                type="text" 
                 className={`w-full px-3 py-1.5 text-sm border rounded-md transition-all outline-none disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 
                 ${errors[field] 
                     ? 'border-red-500 bg-red-50 dark:bg-red-900/20' 
@@ -377,7 +377,16 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
             {/* SUCCESS MODAL */}
             {showSuccessModal && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md p-6 border border-gray-700">
+                    <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md p-6 border border-gray-700 relative">
+                        
+                        {/* Close Button */}
+                        <button 
+                            onClick={closeSuccessModal}
+                            className="absolute top-3 right-3 text-gray-400 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors z-20"
+                            title="Fechar Janela"
+                        >
+                            <X className="w-5 h-5" />
+                        </button>
                         
                         <div className="flex gap-5">
                             {/* Blue Icon */}
@@ -697,7 +706,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     onClick={() => updateField('flightType', FlightType.TURNAROUND)}
                                     className={`flex-1 flex items-center justify-center gap-1 py-1.5 px-2 rounded border text-xs font-medium transition-all ${isTurnaround ? 'bg-purple-600 text-white border-purple-600' : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300'}`}
                                 >
-                                    <ArrowLeftRight className="w-3 h-3" /> Escala
+                                    <ArrowLeftRight className="w-3 h-3" /> Escala - Voo
                                 </button>
                             </div>
                             {errors.flightType && <span className="text-red-500 text-[10px]">{errors.flightType}</span>}

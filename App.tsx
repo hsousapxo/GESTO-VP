@@ -82,7 +82,9 @@ function App() {
             case 'flight-form':
                 return <FlightForm initialData={editingFlight} onClear={handleClearEdit} currentUser={user} />;
             case 'flight-list':
-                return <FlightList onEdit={handleEditFlight} />;
+                return <FlightList onEdit={handleEditFlight} title="Voos Agendados" />;
+            case 'flight-archive':
+                return <FlightList onEdit={handleEditFlight} title="Arquivo de Voos" />;
             case 'flight-tracker':
                 return <FlightTracker />;
             case 'statistics':

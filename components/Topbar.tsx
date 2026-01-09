@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, Sun, Search, Plus, Bell, ChevronDown, Moon, X, Plane, Calendar, FileText, BarChart, Map, Shield, Command } from 'lucide-react';
+import { Menu, Sun, Search, Plus, Bell, ChevronDown, Moon, X, Plane, Calendar, FileText, BarChart, Map, Shield, Command, Archive } from 'lucide-react';
 import { ViewState, UserProfile } from '../types';
 
 interface TopbarProps {
@@ -14,7 +14,8 @@ interface TopbarProps {
 const SEARCH_ITEMS: { label: string; view: ViewState; icon: React.ReactNode; keywords: string[] }[] = [
     { label: 'Dashboard', view: 'dashboard', icon: <Shield className="w-4 h-4" />, keywords: ['home', 'inicio', 'geral'] },
     { label: 'Novo Voo', view: 'flight-form', icon: <Plus className="w-4 h-4" />, keywords: ['criar', 'registar', 'adicionar'] },
-    { label: 'Lista de Voos', view: 'flight-list', icon: <Plane className="w-4 h-4" />, keywords: ['pesquisar', 'ver', 'tabela'] },
+    { label: 'Voos Agendados', view: 'flight-list', icon: <Plane className="w-4 h-4" />, keywords: ['pesquisar', 'ver', 'tabela', 'lista'] },
+    { label: 'Arquivo Voos', view: 'flight-archive', icon: <Archive className="w-4 h-4" />, keywords: ['antigos', 'passados', 'historico'] },
     { label: 'Radar de Voos', view: 'flight-tracker', icon: <Map className="w-4 h-4" />, keywords: ['mapa', 'live', 'rastreio'] },
     { label: 'Lembretes', view: 'reminders', icon: <Bell className="w-4 h-4" />, keywords: ['tarefas', 'avisos', 'agenda'] },
     { label: 'Estatísticas', view: 'statistics', icon: <BarChart className="w-4 h-4" />, keywords: ['graficos', 'analise', 'relatorios'] },

@@ -42,7 +42,8 @@ import {
     PanelLeftOpen,
     CloudSun,
     PlaneTakeoff,
-    PlaneLanding
+    PlaneLanding,
+    Archive
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -268,9 +269,16 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     />
                     <MenuItem 
                         icon={<List />} 
-                        label="Listar Aplicações" 
+                        label="Voos Agendados" 
                         active={currentView === 'flight-list'}
                         onClick={() => onChangeView('flight-list')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Archive />} 
+                        label="Arquivo Voos" 
+                        active={currentView === 'flight-archive'}
+                        onClick={() => onChangeView('flight-archive')}
                         isCollapsed={isCollapsed}
                     />
                 </MenuSection>
