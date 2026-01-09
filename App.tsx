@@ -6,6 +6,7 @@ import AuthView from './components/AuthView';
 import Dashboard from './components/Dashboard';
 import FlightForm from './components/FlightForm';
 import FlightList from './components/FlightList';
+import FlightArchiveAnnual from './components/FlightArchiveAnnual';
 import AiAssistant from './components/AiAssistant';
 import AiImageEditor from './components/AiImageEditor';
 import TemplatesView from './components/TemplatesView';
@@ -42,7 +43,9 @@ import {
     Mail,
     ShieldAlert,
     UserX,
-    ClipboardEdit
+    ClipboardEdit,
+    PieChart,
+    Hash
 } from 'lucide-react';
 
 const GenericReportPlaceholder: React.FC<{ title: string, icon: React.ReactNode }> = ({ title, icon }) => (
@@ -165,11 +168,12 @@ function App() {
             case 'dashboard': return <Dashboard onChangeView={setCurrentView} />;
             case 'flight-form': return <FlightForm initialData={editingFlight} onClear={handleClearEdit} currentUser={user} />;
             case 'flight-list': return <FlightList onEdit={handleEditFlight} title="Voos Agendados" />;
-            case 'flight-archive': return <FlightList onEdit={handleEditFlight} title="Arquivo de Voos" />;
+            case 'flight-archive': return <FlightArchiveAnnual />;
             case 'flight-tracker': return <FlightTracker />;
             case 'statistics': return <StatisticsView />;
             case 'statistics-weekly': return <WeeklyStatisticsView />;
             case 'statistics-monthly': return <MonthlyStatisticsView />;
+            case 'statistics-annual': return <GenericReportPlaceholder title="Comparativo Anual" icon={<PieChart className="w-10 h-10" />} />;
             case 'report-pulsar': return <GenericReportPlaceholder title="Relatório Pulsar" icon={<Activity className="w-10 h-10" />} />;
             case 'report-eurosur': return <GenericReportPlaceholder title="Relatório Eurosur" icon={<Globe className="w-10 h-10" />} />;
             case 'report-ramfa': return <GenericReportPlaceholder title="Relatório RAMFA" icon={<FileSpreadsheet className="w-10 h-10" />} />;
@@ -185,6 +189,7 @@ function App() {
             case 'proc-menores': return <GenericReportPlaceholder title="Controlo de Menores" icon={<Baby className="w-10 h-10" />} />;
             case 'proc-emails': return <GenericReportPlaceholder title="Envio de Emails" icon={<Mail className="w-10 h-10" />} />;
             case 'proc-intercecoes': return <GenericReportPlaceholder title="Interceções" icon={<ShieldAlert className="w-10 h-10" />} />;
+            case 'proc-cod-intercecao': return <GenericReportPlaceholder title="Códigos de Interceção" icon={<Hash className="w-10 h-10" />} />;
             case 'proc-extravio': return <GenericReportPlaceholder title="Extravio Passaporte" icon={<FileWarning className="w-10 h-10" />} />;
             case 'proc-recusa': return <GenericReportPlaceholder title="Recusa de Entrada" icon={<UserX className="w-10 h-10" />} />;
             case 'proc-decl-entrada': return <GenericReportPlaceholder title="Declaração de Entrada" icon={<ClipboardEdit className="w-10 h-10" />} />;

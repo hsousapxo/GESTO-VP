@@ -56,7 +56,8 @@ import {
     Baby,
     ShieldAlert,
     UserX,
-    ClipboardEdit
+    ClipboardEdit,
+    Hash
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -214,6 +215,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                             isCollapsed={isCollapsed}
                             isSmall
                         />
+                        
+                        {/* Nested SubMenu: Códigos de Interceção */}
+                        <SubMenu label="Códigos de Interceção" icon={<Hash className="w-3.5 h-3.5 text-orange-400" />} isCollapsed={isCollapsed}>
+                             <div className="grid grid-cols-3 gap-1 pr-2">
+                                {[...Array(23)].map((_, i) => (
+                                    <MenuItem 
+                                        key={i}
+                                        icon={<span className="text-[10px] font-bold">{i + 1}</span>} 
+                                        label={`${i + 1}`} 
+                                        active={currentView === 'proc-cod-intercecao'} 
+                                        onClick={() => onChangeView('proc-cod-intercecao')} 
+                                        isCollapsed={isCollapsed}
+                                        isSmall
+                                        className="!border-l-0 bg-white/5 hover:bg-white/10 rounded justify-center"
+                                    />
+                                ))}
+                             </div>
+                        </SubMenu>
+
                         <MenuItem 
                             icon={<FileWarning className="w-3.5 h-3.5" />} 
                             label="Extravio Passaporte" 
@@ -257,23 +277,53 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     <MenuItem icon={<Archive />} label="Arquivo Voos" active={currentView === 'flight-archive'} onClick={() => onChangeView('flight-archive')} isCollapsed={isCollapsed} />
                 </MenuSection>
 
-                {/* Relatórios Section */}
-                <MenuSection title="Relatórios" icon={<FileText className="w-4 h-4 text-white" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                {/* Estatísticas Section */}
+                <MenuSection title="Estatísticas" icon={<BarChart3 className="w-4 h-4 text-blue-500" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
                     
-                    {/* Folder: Relatório Turno */}
-                    <SubMenu label="Relatório Turno" icon={<History className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                    {/* Folder: Estatística Semanal */}
+                    <SubMenu label="Estatística Semanal" icon={<LineChart className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
                         <MenuItem 
-                            icon={<List className="w-3.5 h-3.5" />} 
-                            label="Modelo Relatório de Turno" 
-                            active={currentView === 'statistics'} 
-                            onClick={() => onChangeView('statistics')} 
+                            icon={<Activity className="w-3.5 h-3.5" />} 
+                            label="Análise Fluxo Semanal" 
+                            active={currentView === 'statistics-weekly'} 
+                            onClick={() => onChangeView('statistics-weekly')} 
+                            isCollapsed={isCollapsed} 
+                            isSmall
+                        />
+                    </SubMenu>
+
+                    {/* Folder: Estatística Mensal */}
+                    <SubMenu label="Estatística Mensal" icon={<PieChart className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<BarChart className="w-3.5 h-3.5" />} 
+                            label="Consolidado Mensal" 
+                            active={currentView === 'statistics-monthly'} 
+                            onClick={() => onChangeView('statistics-monthly')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<CalendarRange className="w-3.5 h-3.5 opacity-50" />} 
+                            label="Comparativo Anual" 
+                            active={currentView === 'statistics-annual'} 
+                            onClick={() => onChangeView('statistics-annual')} 
                             isCollapsed={isCollapsed}
                             isSmall
                         />
                     </SubMenu>
 
-                    {/* Folder: Relatório Semanal */}
-                    <SubMenu label="Relatório Semanal" icon={<Calendar className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                    <MenuItem 
+                        icon={<History className="w-4 h-4" />} 
+                        label="Geral / Turno" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                </MenuSection>
+
+                {/* Relatórios Section */}
+                <MenuSection title="Relatórios PF" icon={<FileText className="w-4 h-4 text-white" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <SubMenu label="Relatórios Oficiais" icon={<FileSpreadsheet className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
                         <MenuItem 
                             icon={<Activity className="w-3.5 h-3.5" />} 
                             label="Pulsar" 
@@ -291,30 +341,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                             isSmall
                         />
                         <MenuItem 
-                            icon={<BarChart3 className="w-3.5 h-3.5" />} 
-                            label="Estatística Semanal" 
-                            active={currentView === 'statistics-weekly'} 
-                            onClick={() => onChangeView('statistics-weekly')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
-                    </SubMenu>
-
-                    {/* Folder: Relatório Mensal */}
-                    <SubMenu label="Relatório Mensal" icon={<CalendarRange className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
-                        <MenuItem 
                             icon={<FileSpreadsheet className="w-3.5 h-3.5" />} 
                             label="RAMFA" 
                             active={currentView === 'report-ramfa'} 
                             onClick={() => onChangeView('report-ramfa')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
-                        <MenuItem 
-                            icon={<LineChart className="w-3.5 h-3.5" />} 
-                            label="Estatística Mensal" 
-                            active={currentView === 'statistics-monthly'} 
-                            onClick={() => onChangeView('statistics-monthly')} 
                             isCollapsed={isCollapsed}
                             isSmall
                         />
