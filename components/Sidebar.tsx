@@ -57,7 +57,11 @@ import {
     ShieldAlert,
     UserX,
     ClipboardEdit,
-    Hash
+    Hash,
+    Smartphone,
+    ExternalLink,
+    Lock,
+    ShieldCheck
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -117,6 +121,70 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 {/* GS PF008 Section */}
                 <MenuSection title="GS PF008" icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
                     
+                    {/* Folder: APP PF008 */}
+                    <SubMenu label="APP PF008" icon={<Smartphone className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        {/* New Nested Folder: APP PF */}
+                        <SubMenu label="APP PF" icon={<Layers className="w-3.5 h-3.5 text-blue-300" />} isCollapsed={isCollapsed}>
+                            <MenuItem 
+                                icon={<Lock className="w-3 h-3" />} 
+                                label="SISII" 
+                                onClick={() => openExternalLink('https://sis2.rnsi.local/SchengenII/faces/pages/index.jspx')}
+                                isCollapsed={isCollapsed}
+                                isSmall
+                                className="!border-l-0 text-orange-300"
+                            />
+                            <MenuItem 
+                                icon={<Globe className="w-3 h-3" />} 
+                                label="Portal Fronteiras" 
+                                onClick={() => openExternalLink('https://portalfronteiras.ssi.local/')}
+                                isCollapsed={isCollapsed}
+                                isSmall
+                                className="!border-l-0 text-blue-300"
+                            />
+                            <MenuItem 
+                                icon={<ShieldCheck className="w-3 h-3" />} 
+                                label="PASSE+" 
+                                onClick={() => openExternalLink('https://iam.ssi.local/realms/realm-scf/protocol/openid-connect/auth?client_id=client-scf-frontend&redirect_uri=https%3A%2F%2Fpasse.ssi.local%2Fapp&state=af052487-53a8-4e75-a0c5-304edca79254&response_mode=fragment&response_type=code&scope=openid&nonce=bf881dee-1ef6-41d9-ad18-081a2897639f')}
+                                isCollapsed={isCollapsed}
+                                isSmall
+                                className="!border-l-0 text-green-300"
+                            />
+                            <MenuItem 
+                                icon={<Cpu className="w-3 h-3" />} 
+                                label="PRISMA" 
+                                onClick={() => openExternalLink('https://iam.ssi.local/realms/realm-prisma/protocol/saml/clients/client-prisma-app?SAMLRequest=fJJfT4MwFMW%2FCul7geLGXDNIcIuRZFMy0AdfTAfFNSkt9hb%2FfHsrbMl80KcmN%2Bfc87snXQHrZE%2BzwR7Vnr8NHKyXbxL0EkfLebRsQkxIuMCz%2BXKGD019wPO4XSwIiVtSx8h74gaEVgmK%2FBB5OcDAcwWWKetGYRTjkOBwWZFrehXSkDwjrzDa6lrLG6EaoV4TNBhFNQMBVLGOA7U1LbPdlrqN9DCJgN5VVYGLh7JCXgbAjXWha61g6LgpuXkXNX%2FcbxN0tLYHGgS9EdAxH0D4UtdMBsU%2BL3dZULprg5MReZ%2BdVEDHBv7n6E%2FQKF39qOl4qLnw%2F29nZ2SUngEF6y7oDGeyg%2BnBE%2FsquEiaYnt671bnm0JLUX95t9p0zPX8VzLxyTgRDW5HKR0U9LwWreCN61FK%2FbF2kZYnyJrB9RGkU%2Brv%2F5B%2BAwAA%2F%2F8DAA%3D%3D')}
+                                isCollapsed={isCollapsed}
+                                isSmall
+                                className="!border-l-0 text-purple-300"
+                            />
+                        </SubMenu>
+
+                        <MenuItem 
+                            icon={<Bot className="w-3.5 h-3.5" />} 
+                            label="IA Assistant" 
+                            active={currentView === 'ai-assistant'} 
+                            onClick={() => onChangeView('ai-assistant')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Camera className="w-3.5 h-3.5" />} 
+                            label="Editor de Imagem IA" 
+                            active={currentView === 'ai-image-editor'} 
+                            onClick={() => onChangeView('ai-image-editor')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Radar className="w-3.5 h-3.5" />} 
+                            label="Radar de Voos" 
+                            active={currentView === 'flight-tracker'} 
+                            onClick={() => onChangeView('flight-tracker')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+
                     {/* Folder: Modelos e Formulários */}
                     <SubMenu label="Modelos e Formulários" icon={<Files className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
                         <MenuItem 
@@ -426,7 +494,7 @@ const SubMenu: React.FC<SubMenuProps> = ({ label, icon, children, isCollapsed })
                 </div>
                 {isOpen ? <ChevronDown className="w-3.5 h-3.5 opacity-50" /> : <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
             </button>
-            <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
                 <div className="pl-6 border-l border-white/5 ml-6 py-1 flex flex-col gap-0.5">
                     {children}
                 </div>
