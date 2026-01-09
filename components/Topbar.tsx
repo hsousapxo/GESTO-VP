@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Moon, Sun, Search, Plus, BellRing, UserCircle } from 'lucide-react';
+import { Menu, Sun, Search, Plus, Bell, MessageCircle, ChevronDown, Moon } from 'lucide-react';
 import { ViewState, UserProfile } from '../types';
 
 interface TopbarProps {
@@ -11,99 +11,86 @@ interface TopbarProps {
 }
 
 const Topbar: React.FC<TopbarProps> = ({ onToggleSidebar, darkMode, toggleDarkMode, onChangeView, user }) => {
-    const [time, setTime] = useState(new Date());
     const [greeting, setGreeting] = useState('');
 
     useEffect(() => {
-        const timer = setInterval(() => setTime(new Date()), 1000);
-        
-        // Calculate greeting
         const hour = new Date().getHours();
         if (hour >= 5 && hour < 12) setGreeting('Bom dia');
         else if (hour >= 12 && hour < 20) setGreeting('Boa tarde');
         else setGreeting('Boa noite');
-
-        return () => clearInterval(timer);
     }, []);
 
     return (
-        <div className="bg-white dark:bg-gray-800 px-6 py-4 flex flex-col md:flex-row gap-4 md:gap-0 justify-between items-center shadow-sm z-40 sticky top-0 transition-colors duration-200 border-b border-gray-100 dark:border-gray-700">
-            {/* Left Section: Toggle & User Info */}
-            <div className="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                <div className="flex items-center gap-4">
-                    <button 
+        <div className="px-8 pt-10 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 z-40 bg-[#0a0e17]">
+            {/* Left Section: Giant Typography */}
+            <div className="flex flex-col">
+                <div className="lg:hidden mb-4">
+                     <button 
                         onClick={onToggleSidebar}
-                        className="lg:hidden text-gray-700 dark:text-gray-200 hover:text-primary transition-colors"
+                        className="text-gray-400 hover:text-white transition-colors"
                     >
-                        <Menu className="w-6 h-6" />
+                        <Menu className="w-8 h-8" />
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="hidden md:flex w-10 h-10 bg-primary/10 dark:bg-blue-900/30 rounded-full items-center justify-center text-primary dark:text-blue-400">
-                            <UserCircle className="w-6 h-6" />
-                        </div>
-                        <div>
-                            <h1 className="text-xl md:text-xl font-bold text-primary dark:text-blue-400 flex items-center gap-1">
-                                {greeting}! <span className="text-gray-800 dark:text-gray-100">{user ? `${user.firstName} ${user.lastName}` : 'Utilizador'}</span>
-                            </h1>
-                            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
-                                {user ? user.category : 'Não autenticado'}
-                            </p>
-                        </div>
-                    </div>
+                </div>
+                
+                <div className="flex flex-col leading-[0.9]">
+                    <h1 className="text-5xl md:text-6xl font-bold text-white tracking-tight">
+                        {greeting}!
+                    </h1>
+                    <h1 className="text-5xl md:text-6xl font-bold text-gray-500 opacity-60 tracking-tight">
+                        {user ? user.firstName : 'Utilizador'}
+                    </h1>
+                </div>
+                
+                <div className="flex items-center gap-2 mt-4">
+                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                    <span className="text-gray-400 font-medium tracking-wide">{user ? user.category : 'Agente'}</span>
                 </div>
             </div>
 
-            {/* Right Section: Actions & Stats */}
-            <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+            {/* Right Section: Floating Pill Action Bar */}
+            <div className="bg-[#131b2e] p-1.5 pr-6 rounded-full border border-white/5 shadow-2xl flex items-center gap-5 self-start md:self-end">
                 
-                {/* Search Bar */}
-                <div className="relative w-full md:w-64">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <input
-                        type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-gray-200 dark:border-gray-600 rounded-lg leading-5 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-primary dark:focus:ring-blue-500 focus:border-primary dark:focus:border-blue-500 sm:text-sm transition-colors"
-                        placeholder="Pesquisar..."
-                    />
-                </div>
+                {/* Novo Button */}
+                <button 
+                    onClick={() => onChangeView?.('flight-form')}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white pl-5 pr-4 py-3 rounded-full text-sm font-bold transition-all shadow-lg shadow-blue-900/40 group"
+                >
+                    <Plus className="w-5 h-5 stroke-[3]" />
+                    Novo
+                    <ChevronDown className="w-4 h-4 ml-1 opacity-70 group-hover:translate-y-0.5 transition-transform" />
+                </button>
 
-                {/* Quick Actions Buttons */}
-                <div className="flex items-center gap-2 w-full md:w-auto justify-end">
-                    <button 
-                        onClick={() => onChangeView?.('flight-form')}
-                        className="flex items-center gap-1 bg-primary dark:bg-blue-600 hover:bg-secondary dark:hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                        title="Novo Voo"
-                    >
-                        <Plus className="w-4 h-4" />
-                        <span className="hidden sm:inline">Voo</span>
-                    </button>
-                    
-                    <button 
-                        onClick={() => onChangeView?.('reminders')}
-                        className="flex items-center gap-1 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                        title="Novo Lembrete"
-                    >
-                        <BellRing className="w-4 h-4" />
-                        <span className="hidden sm:inline">Lembrete</span>
-                    </button>
-                </div>
+                {/* Vertical Divider */}
+                <div className="w-px h-8 bg-gray-700"></div>
 
-                {/* System Info */}
-                <div className="hidden md:flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-gray-600">
-                     {toggleDarkMode && (
+                {/* Icons */}
+                <div className="flex items-center gap-3">
+                    {toggleDarkMode && (
                         <button 
                             onClick={toggleDarkMode}
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-colors"
+                            className="text-gray-400 hover:text-white transition-colors"
                             title={darkMode ? "Modo Claro" : "Modo Escuro"}
                         >
-                            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+                            {darkMode ? <Sun className="w-6 h-6 stroke-[1.5]" /> : <Moon className="w-6 h-6 stroke-[1.5]" />}
                         </button>
                     )}
                     
-                    <div className="text-xl font-bold text-primary dark:text-blue-400">
-                        {time.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+                    <button className="text-gray-400 hover:text-white transition-colors">
+                        <MessageCircle className="w-6 h-6 stroke-[1.5]" />
+                    </button>
+
+                    <button className="text-gray-400 hover:text-white transition-colors">
+                        <Search className="w-6 h-6 stroke-[1.5]" />
+                    </button>
+
+                    <button 
+                        onClick={() => onChangeView?.('reminders')}
+                        className="text-gray-400 hover:text-white transition-colors relative"
+                    >
+                        <Bell className="w-6 h-6 stroke-[1.5]" />
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-[#131b2e]"></span>
+                    </button>
                 </div>
             </div>
         </div>

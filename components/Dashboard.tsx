@@ -1,7 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Sun, CloudSun, Calendar, ArrowRight, Clock, CloudRain, Cloud, Wind, ChevronLeft, ChevronRight, Plus, CalendarDays } from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { ViewState, FlightFormData } from '../types';
+import { 
+    Calendar as CalendarIcon, 
+    Plus, 
+    Bell, 
+    AlertTriangle, 
+    Plane, 
+    Clock, 
+    MapPin, 
+    Sun, 
+    CloudSun, 
+    CloudRain, 
+    Wind, 
+    Droplets, 
+    Thermometer,
+    ChevronLeft,
+    ChevronRight,
+    Eye,
+    Archive,
+    Trash2,
+    MoreHorizontal,
+    Users
+} from 'lucide-react';
+import { ViewState, FlightFormData, FlightType } from '../types';
 import { getFlights } from '../services/db';
 
 interface DashboardProps {
@@ -9,341 +29,389 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ onChangeView }) => {
+    const [flights, setFlights] = useState<FlightFormData[]>([]);
+    
+    useEffect(() => {
+        // Mock loading or real loading
+        getFlights().then(setFlights).catch(console.error);
+    }, []);
+
     return (
-        <div className="p-6 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            <WeekCalendarWidget onChangeView={onChangeView} />
-            <NextFlightsWidget />
-            <WeatherWidget />
-            <StatsWidget />
+        <div className="p-6 pt-2 h-full flex flex-col relative overflow-y-auto custom-scrollbar">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+                
+                {/* Left Column (Span 2) - Calendar & Events */}
+                <div className="lg:col-span-2 flex flex-col gap-6">
+                    <WeekCalendarWidget />
+                    <NextEventsWidget flights={flights} />
+                </div>
+
+                {/* Right Column (Span 1) - Weather/Clock Card */}
+                <div className="lg:col-span-1 h-full">
+                    <WeatherClockWidget />
+                </div>
+            </div>
+
+            {/* Footer: Monthly Summary (Cloned Design) */}
+            <MonthlySummaryFooter flights={flights} />
+
+            {/* Floating Action Button */}
+            <button 
+                onClick={() => onChangeView?.('flight-form')}
+                className="fixed bottom-8 right-8 w-14 h-14 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg shadow-blue-500/40 text-white flex items-center justify-center transition-transform hover:scale-110 z-50"
+            >
+                <Plus className="w-8 h-8" />
+            </button>
         </div>
     );
 };
 
-// --- Widgets ---
+// --- Widget: Monthly Summary (Cloned Footer) ---
 
-const WeekCalendarWidget: React.FC<{ onChangeView?: (view: ViewState) => void }> = ({ onChangeView }) => {
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDate, setSelectedDate] = useState(new Date());
+const MonthlySummaryFooter: React.FC<{ flights: FlightFormData[] }> = ({ flights }) => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    const monthName = today.toLocaleDateString('pt-PT', { month: 'long' });
 
-    // Helper to get the Monday of the current week
-    const getMonday = (d: Date) => {
-        d = new Date(d);
-        const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-        return new Date(d.setDate(diff));
-    };
+    // Filter realized flights for the current month
+    const monthlyFlights = flights.filter(f => {
+        if (f.status !== 'Realizado') return false;
+        const fDateStr = f.dateArrival || f.dateDeparture;
+        if (!fDateStr) return false;
+        const fDate = new Date(fDateStr);
+        return fDate.getMonth() === currentMonth && fDate.getFullYear() === currentYear;
+    });
 
-    const monday = getMonday(currentDate);
-    const weekDays = [];
-    
-    for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
-        weekDays.push(d);
-    }
+    let totalFlights = monthlyFlights.length;
+    let totalPaxUE = 0;
+    let totalPaxExtra = 0;
+    let totalCrew = 0;
 
-    const prevWeek = () => {
-        const d = new Date(currentDate);
-        d.setDate(d.getDate() - 7);
-        setCurrentDate(d);
-    };
-
-    const nextWeek = () => {
-        const d = new Date(currentDate);
-        d.setDate(d.getDate() + 7);
-        setCurrentDate(d);
-    };
-
-    const isSameDay = (d1: Date, d2: Date) => {
-        return d1.getDate() === d2.getDate() && 
-               d1.getMonth() === d2.getMonth() && 
-               d1.getFullYear() === d2.getFullYear();
-    };
-
-    const weekNumber = Math.ceil((((currentDate.getTime() - new Date(currentDate.getFullYear(), 0, 1).getTime()) / 86400000) + 1) / 7);
+    monthlyFlights.forEach(f => {
+        // Arrival Logic
+        if (f.flightType === FlightType.ARRIVAL || f.flightType === FlightType.TURNAROUND) {
+            totalPaxUE += f.arrivalUeCount || 0;
+            totalPaxExtra += f.arrivalNonSchengenCount || 0;
+            totalCrew += f.arrivalCrewCount || 0;
+        }
+        // Departure Logic
+        if (f.flightType === FlightType.DEPARTURE || f.flightType === FlightType.TURNAROUND) {
+            totalPaxUE += f.departureUeCount || 0;
+            totalPaxExtra += f.departureNonSchengenCount || 0;
+            totalCrew += f.departureCrewCount || 0;
+        }
+    });
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700 transition-colors flex flex-col h-full">
-            <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <div className="flex items-center gap-2">
-                    <button onClick={prevWeek} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 transition-colors">
-                        <ChevronLeft className="w-5 h-5" />
-                    </button>
-                    <h3 className="text-lg font-bold text-primary dark:text-blue-400 select-none">Semana {weekNumber}</h3>
-                    <button onClick={nextWeek} className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-500 transition-colors">
-                        <ChevronRight className="w-5 h-5" />
-                    </button>
+        <div className="bg-[#131b2e] rounded-[32px] p-8 border border-white/5 mb-20">
+            <div className="flex items-center gap-6 mb-8 justify-center md:justify-start">
+                <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+                    <CalendarIcon className="w-8 h-8 text-white stroke-[2.5]" />
                 </div>
-                <div className="flex gap-2">
-                     <button 
-                        onClick={() => onChangeView?.('calendar-monthly')}
-                        className="text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors"
-                        title="Ver Vista Mensal"
-                    >
-                        <CalendarDays className="w-5 h-5" />
-                    </button>
-                    <button 
-                        onClick={() => onChangeView?.('reminders')}
-                        className="text-gray-400 hover:text-primary dark:hover:text-blue-400 transition-colors"
-                        title="Adicionar Lembrete"
-                    >
-                        <Plus className="w-5 h-5" />
-                    </button>
+                <div>
+                    <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">RESUMO MENSAL</h3>
+                    <h2 className="text-3xl font-bold text-white capitalize leading-none">{monthName} {currentYear}</h2>
                 </div>
             </div>
-            
-            <div className="grid grid-cols-7 gap-2 text-center mb-6">
-                {weekDays.map((d, i) => {
-                    const dayName = d.toLocaleDateString('pt-PT', { weekday: 'short' }).replace('.', '').toUpperCase();
-                    const dayNum = d.getDate();
-                    const isSelected = isSameDay(d, selectedDate);
-                    const isToday = isSameDay(d, new Date());
 
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Card 1: Voos Realizados */}
+                <div className="bg-[#1a2333] border border-white/5 p-6 rounded-2xl flex flex-col gap-3 group hover:bg-[#1f2a3d] transition-colors">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300">VOOS REALIZADOS</span>
+                    <div className="flex items-center gap-3">
+                        <Plane className="w-6 h-6 text-blue-500 fill-blue-500/20" />
+                        <span className="text-3xl font-bold text-white">{totalFlights}</span>
+                    </div>
+                </div>
+
+                {/* Card 2: Pax UE */}
+                <div className="bg-[#1a2333] border border-white/5 p-6 rounded-2xl flex flex-col gap-3 group hover:bg-[#1f2a3d] transition-colors">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300">PAX UE</span>
+                    <div className="flex items-center gap-3">
+                        <Users className="w-6 h-6 text-blue-500" />
+                        <span className="text-3xl font-bold text-white">{totalPaxUE}</span>
+                    </div>
+                </div>
+
+                {/* Card 3: Pax CE */}
+                <div className="bg-[#1a2333] border border-white/5 p-6 rounded-2xl flex flex-col gap-3 group hover:bg-[#1f2a3d] transition-colors">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300">PAX CE</span>
+                    <div className="flex items-center gap-3">
+                        <Users className="w-6 h-6 text-orange-500" />
+                        <span className="text-3xl font-bold text-white">{totalPaxExtra}</span>
+                    </div>
+                </div>
+
+                {/* Card 4: Tripulação */}
+                <div className="bg-[#1a2333] border border-white/5 p-6 rounded-2xl flex flex-col gap-3 group hover:bg-[#1f2a3d] transition-colors">
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider group-hover:text-gray-300">TRIPULAÇÃO</span>
+                    <div className="flex items-center gap-3">
+                        <Users className="w-6 h-6 text-gray-400" />
+                        <span className="text-3xl font-bold text-white">{totalCrew}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// --- Widget: Week Calendar (Cloned Style) ---
+
+const WeekCalendarWidget: React.FC = () => {
+    const days = [
+        { w: 'SEG', d: 5, active: false, alert: false },
+        { w: 'TER', d: 6, active: false, alert: true }, // Red dot
+        { w: 'QUA', d: 7, active: false, alert: false },
+        { w: 'QUI', d: 8, active: true, alert: false }, // Active Blue
+        { w: 'SEX', d: 9, active: false, alert: false },
+        { w: 'SÁB', d: 10, active: false, alert: false }, // Yellow text in image implies weekend?
+        { w: 'DOM', d: 11, active: false, alert: false }, // Yellow text
+    ];
+
+    return (
+        <div className="bg-[#131b2e] rounded-[32px] p-8 border border-white/5 relative overflow-hidden">
+            {/* Background Glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+
+            <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    Semana N.º 2
+                </h3>
+                <div className="flex gap-2">
+                    <button className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"><ChevronLeft className="w-5 h-5" /></button>
+                    <button className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"><ChevronRight className="w-5 h-5" /></button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+                {days.map((day, idx) => {
+                    const isWeekend = day.w === 'SÁB' || day.w === 'DOM';
                     return (
-                        <div key={i} className="flex flex-col items-center gap-1">
-                            <div className="text-[10px] font-bold text-gray-400 dark:text-gray-500">{dayName}</div>
-                            <button 
-                                onClick={() => setSelectedDate(d)}
-                                className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-bold transition-all
-                                    ${isSelected ? 'bg-primary dark:bg-blue-600 text-white shadow-md scale-110' : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'}
-                                    ${!isSelected && isToday ? 'border border-primary dark:border-blue-400 text-primary dark:text-blue-400' : ''}
-                                `}
-                            >
-                                {dayNum}
-                            </button>
+                        <div key={idx} className="flex flex-col items-center gap-3 group cursor-pointer">
+                            <span className={`text-[10px] font-bold tracking-wider ${isWeekend ? 'text-yellow-500' : 'text-gray-400'}`}>
+                                {day.w}
+                            </span>
+                            
+                            <div className={`
+                                w-10 h-10 flex items-center justify-center rounded-full text-sm font-bold transition-all relative
+                                ${day.active 
+                                    ? 'bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.5)] scale-110' 
+                                    : 'text-white hover:bg-white/5'}
+                            `}>
+                                {day.d}
+                                {day.active && (
+                                    <div className="absolute -bottom-1 w-1 h-1 bg-white rounded-full opacity-50"></div>
+                                )}
+                            </div>
+
+                            {/* Alert Dot */}
+                            <div className={`w-1.5 h-1.5 rounded-full ${day.alert ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.8)]' : 'bg-transparent'}`}></div>
                         </div>
                     );
                 })}
             </div>
-            
-            <div className="mt-auto pt-4 border-t border-gray-100 dark:border-gray-700">
-                <div className="flex justify-between items-start">
-                    <div>
-                        <p className="font-semibold text-gray-800 dark:text-gray-100 capitalize">
-                            {selectedDate.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-                        </p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                            {isSameDay(selectedDate, new Date()) ? 'Hoje: Turno A (08h-20h)' : 'Sem escalas definidas'}
-                        </p>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
 
-const NextFlightsWidget: React.FC = () => {
-    const [recentFlights, setRecentFlights] = useState<FlightFormData[]>([]);
+// --- Widget: Next Events (Cloned Style) ---
 
-    useEffect(() => {
-        const loadFlights = async () => {
-            const data = await getFlights();
-            // Take top 3 for the widget
-            setRecentFlights(data.slice(0, 3));
-        };
-        loadFlights();
-    }, []);
+const NextEventsWidget: React.FC<{ flights: FlightFormData[] }> = ({ flights }) => {
+    const [activeTab, setActiveTab] = useState<'Todos' | 'Voos' | 'Alertas'>('Todos');
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'Realizado': return 'text-blue-600 dark:text-blue-400';
-            case 'Confirmado': return 'text-green-600 dark:text-green-400';
-            case 'Cancelado': return 'text-red-600 dark:text-red-400';
-            default: return 'text-yellow-600 dark:text-yellow-400';
-        }
-    };
-
-    return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700 flex flex-col transition-colors">
-            <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h3 className="text-lg font-bold text-primary dark:text-blue-400">PRÓXIMOS EVENTOS</h3>
-                <div className="flex gap-1">
-                    <button className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs font-medium rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300">Voos</button>
-                    <button className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-xs font-medium rounded hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300">Alertas</button>
-                </div>
-            </div>
-            <div className="flex-1 space-y-4">
-                {recentFlights.length === 0 ? (
-                    <div className="text-center text-gray-400 py-4 text-sm">Sem voos recentes registados</div>
-                ) : (
-                    recentFlights.map((flight, idx) => {
-                        const time = flight.scheduleTimeArrival || flight.scheduleTimeDeparture || '--:--';
-                        const route = flight.flightType === 'chegada' ? `${flight.origin} → LPPS` :
-                                      flight.flightType === 'partida' ? `LPPS → ${flight.destination}` :
-                                      `${flight.origin} ↔ ${flight.destination}`;
-                        
-                        return (
-                            <div key={idx} className="flex justify-between items-start pb-3 border-b border-gray-50 dark:border-gray-700 last:border-0">
-                                <div>
-                                    <p className={`font-bold text-sm ${getStatusColor(flight.status)}`}>
-                                        {flight.flightNumber} ({flight.status})
-                                    </p>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                                        {time} <ArrowRight className="w-3 h-3" /> {route}
-                                    </p>
-                                </div>
-                                <span className="font-bold text-gray-800 dark:text-gray-200 text-sm">{time}</span>
-                            </div>
-                        );
-                    })
-                )}
-                
-                {/* Fallback Example Item just to fill space if empty */}
-                {recentFlights.length < 3 && (
-                     <div className="flex justify-between items-start pb-3 border-b border-gray-50 dark:border-gray-700 last:border-0 opacity-50">
-                        <div>
-                            <p className="font-bold text-primary dark:text-blue-300 text-sm">Renovar Cartão Aeroportuário</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">10:00 - Tratar na secção de segurança</p>
-                        </div>
-                        <div className="text-accent dark:text-blue-400">
-                             <Clock className="w-4 h-4" />
-                        </div>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const WeatherWidget: React.FC = () => {
-    const [location, setLocation] = useState<'pxo' | 'fnc'>('pxo');
-
-    const data = {
-        pxo: {
-            temp: 25,
-            condition: 'Ensolarado',
-            icon: <Sun className="w-16 h-16 text-yellow-400" />,
-            feelsLike: 25,
-            max: 24,
-            min: 19,
-            pressure: 1013,
-            sunrise: '07:45',
-            sunset: '18:35',
-            duration: 9.5,
-            forecast: [
-                { day: 'Sexta', icon: <Sun className="w-5 h-5 text-yellow-400" />, min: 19, max: 24 },
-                { day: 'Sábado', icon: <CloudSun className="w-5 h-5 text-yellow-500" />, min: 18, max: 23 },
-                { day: 'Domingo', icon: <Cloud className="w-5 h-5 text-gray-400" />, min: 18, max: 22 },
-            ]
+    // Mock Data to match the image exactly
+    const events = [
+        {
+            id: 1,
+            type: 'alert',
+            title: 'Renovar Cartão Aeroporto',
+            time: '10:00',
+            desc: 'Tratar na secção de segurança',
+            color: 'red'
         },
-        fnc: {
-            temp: 22,
-            condition: 'Parcialmente Nublado',
-            icon: <CloudSun className="w-16 h-16 text-yellow-500" />,
-            feelsLike: 21,
-            max: 23,
-            min: 18,
-            pressure: 1015,
-            sunrise: '08:02',
-            sunset: '18:28',
-            duration: 10.4,
-             forecast: [
-                { day: 'Sexta', icon: <CloudRain className="w-5 h-5 text-blue-400" />, min: 17, max: 21 },
-                { day: 'Sábado', icon: <CloudSun className="w-5 h-5 text-yellow-500" />, min: 18, max: 22 },
-                { day: 'Domingo', icon: <Wind className="w-5 h-5 text-gray-500" />, min: 16, max: 20 },
-            ]
+        {
+            id: 2,
+            type: 'flight',
+            title: 'Voo TP1699',
+            time: '14:30',
+            desc: 'LPPT - LPPS',
+            color: 'blue'
+        },
+        {
+            id: 3,
+            type: 'flight',
+            title: 'Voo EZY451',
+            time: '16:15',
+            desc: 'LGW - LPPS',
+            color: 'blue'
+        },
+        {
+            id: 4,
+            type: 'alert',
+            title: 'Relatório Pendente',
+            time: 'Agora',
+            desc: 'O relatório de turno da noite (05/01) requer atenção',
+            color: 'red'
         }
-    };
+    ];
 
-    const current = data[location];
+    const filteredEvents = activeTab === 'Todos' 
+        ? events 
+        : activeTab === 'Voos' 
+            ? events.filter(e => e.type === 'flight') 
+            : events.filter(e => e.type === 'alert');
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700 transition-colors flex flex-col h-full">
-             <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h3 className="text-lg font-bold text-primary dark:text-blue-400">Previsão do Tempo</h3>
-            </div>
-            
-            <div className="flex bg-gray-100 dark:bg-gray-700 rounded-full p-1 mb-4">
-                <button 
-                    onClick={() => setLocation('pxo')}
-                    className={`flex-1 py-2 text-sm font-medium rounded-full transition-all ${location === 'pxo' ? 'bg-primary dark:bg-blue-600 text-white shadow-sm' : 'text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'}`}
-                >
-                    PXO
-                </button>
-                <button 
-                    onClick={() => setLocation('fnc')}
-                    className={`flex-1 py-2 text-sm font-medium rounded-full transition-all ${location === 'fnc' ? 'bg-primary dark:bg-blue-600 text-white shadow-sm' : 'text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white'}`}
-                >
-                    FNC
+        <div className="bg-[#131b2e] rounded-[32px] p-6 border border-white/5 flex flex-col flex-1 min-h-[400px]">
+            <div className="flex justify-between items-center mb-6">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">PRÓXIMOS EVENTOS</span>
+                <button className="bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-lg transition-colors">
+                    <Plus className="w-5 h-5" />
                 </button>
             </div>
 
-            <div className="flex flex-col items-center mb-4">
-                <div className="mb-2 animate-pulse">{current.icon}</div>
-                <div className="text-4xl font-bold text-gray-800 dark:text-white">{current.temp}°</div>
-                <div className="text-gray-500 dark:text-gray-400 font-medium">{current.condition}</div>
+            {/* Tabs */}
+            <div className="flex bg-[#0b0f1a] p-1 rounded-xl mb-6">
+                {['Todos', 'Voos', 'Alertas'].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab as any)}
+                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all ${
+                            activeTab === tab 
+                            ? 'bg-blue-600 text-white shadow-md' 
+                            : 'text-gray-500 hover:text-gray-300'
+                        }`}
+                    >
+                        {tab}
+                    </button>
+                ))}
             </div>
 
-            <div className="grid grid-cols-3 gap-2 text-center mb-4 text-sm">
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded p-2">
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block uppercase">Sensação</span>
-                    <span className="font-bold text-gray-700 dark:text-gray-300">{current.feelsLike}°</span>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded p-2">
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block uppercase">Máx</span>
-                    <span className="font-bold text-gray-700 dark:text-gray-300">{current.max}°</span>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded p-2">
-                    <span className="text-xs text-gray-400 dark:text-gray-500 block uppercase">Mín</span>
-                    <span className="font-bold text-gray-700 dark:text-gray-300">{current.min}°</span>
-                </div>
-            </div>
-
-            {/* 3-Day Forecast */}
-            <div className="mt-auto border-t border-gray-100 dark:border-gray-700 pt-4">
-                <h4 className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-3">Próximos 3 Dias</h4>
-                <div className="space-y-2">
-                    {current.forecast.map((day, idx) => (
-                        <div key={idx} className="flex items-center justify-between p-2 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-16">{day.day}</span>
-                            <div className="flex-1 flex justify-center">
-                                {day.icon}
+            {/* List */}
+            <div className="space-y-3 overflow-y-auto custom-scrollbar flex-1 pr-1">
+                {filteredEvents.map((item) => (
+                    <div key={item.id} className="bg-[#1a2333] hover:bg-[#1f2a3d] p-4 rounded-2xl border border-white/5 transition-colors group flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            {/* Icon Box */}
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
+                                item.type === 'alert' ? 'bg-red-500/20 text-red-500' : 'bg-blue-500/20 text-blue-500'
+                            }`}>
+                                {item.type === 'alert' ? <AlertTriangle className="w-5 h-5" /> : <Plane className="w-5 h-5" />}
                             </div>
-                            <div className="flex gap-3 text-sm">
-                                <span className="font-bold text-gray-800 dark:text-white">{day.max}°</span>
-                                <span className="text-gray-400 dark:text-gray-500">{day.min}°</span>
+                            
+                            <div className="overflow-hidden">
+                                <h4 className="text-white font-bold text-sm truncate">{item.title}</h4>
+                                <div className="flex items-center gap-2 text-xs text-gray-400">
+                                    <span className={item.time === 'Agora' ? 'text-red-400 font-bold' : ''}>{item.time}</span>
+                                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
+                                    <span className="truncate max-w-[150px]">{item.desc}</span>
+                                </div>
                             </div>
                         </div>
-                    ))}
-                </div>
+
+                        {/* Hover Actions */}
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg"><Eye className="w-4 h-4" /></button>
+                            <button className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-white/10 rounded-lg"><Archive className="w-4 h-4" /></button>
+                            <button className="p-1.5 text-gray-400 hover:text-red-400 hover:bg-white/10 rounded-lg"><Trash2 className="w-4 h-4" /></button>
+                        </div>
+                    </div>
+                ))}
             </div>
-            
         </div>
     );
 };
 
-const StatsWidget: React.FC = () => {
-    const data = [
-      { name: 'Seg', uv: 40 },
-      { name: 'Ter', uv: 30 },
-      { name: 'Qua', uv: 20 },
-      { name: 'Qui', uv: 27 },
-      { name: 'Sex', uv: 18 },
-      { name: 'Sab', uv: 23 },
-      { name: 'Dom', uv: 34 },
+// --- Widget: Weather & Clock (Cloned Vertical Card) ---
+
+const WeatherClockWidget: React.FC = () => {
+    const [location, setLocation] = useState<'PXO' | 'FNC'>('PXO');
+
+    // Forecast Data
+    const forecast = [
+        { d: 'SEX', icon: <Sun className="w-5 h-5 text-yellow-400" />, temp: '23°/19°' },
+        { d: 'SÁB', icon: <CloudSun className="w-5 h-5 text-gray-300" />, temp: '21°/18°' },
+        { d: 'DOM', icon: <CloudRain className="w-5 h-5 text-blue-400" />, temp: '19°/17°' },
+        { d: 'SEG', icon: <CloudSun className="w-5 h-5 text-gray-300" />, temp: '20°/18°' },
     ];
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 border border-gray-100 dark:border-gray-700 lg:col-span-2 xl:col-span-3 transition-colors">
-             <div className="flex justify-between items-center mb-4 border-b border-gray-100 dark:border-gray-700 pb-3">
-                <h3 className="text-lg font-bold text-primary dark:text-blue-400">Fluxo de Passageiros (Semanal)</h3>
+        <div className="h-full bg-gradient-to-b from-[#131b2e] to-[#0a0f1d] rounded-[32px] p-8 border border-white/5 relative flex flex-col justify-between overflow-hidden">
+             {/* Background Effects */}
+             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+
+            {/* Header */}
+            <div>
+                <div className="flex justify-between items-start">
+                    <div>
+                        <h2 className="text-xl font-bold text-white leading-tight w-3/4">Quinta-feira, 8 de janeiro de 2026</h2>
+                        <div className="flex items-center gap-1.5 text-gray-400 text-sm mt-1">
+                            <MapPin className="w-4 h-4" />
+                            <span>Porto Santo ({location})</span>
+                        </div>
+                    </div>
+                    {/* Toggle */}
+                    <div className="flex bg-black/30 p-1 rounded-lg border border-white/5">
+                        <button 
+                            onClick={() => setLocation('PXO')}
+                            className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${location === 'PXO' ? 'bg-white text-black' : 'text-gray-500'}`}
+                        >
+                            PXO
+                        </button>
+                        <button 
+                            onClick={() => setLocation('FNC')}
+                            className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${location === 'FNC' ? 'bg-white text-black' : 'text-gray-500'}`}
+                        >
+                            FNC
+                        </button>
+                    </div>
+                </div>
+
+                {/* Big Clock */}
+                <div className="text-center mt-12 mb-4">
+                    <h1 className="text-7xl font-extralight text-white tracking-wide">22:45</h1>
+                </div>
+
+                {/* Micro Stats */}
+                <div className="flex justify-center gap-6 text-xs text-gray-400 mb-8">
+                    <div className="flex items-center gap-1">
+                        <Droplets className="w-3 h-3" /> 81%
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <Thermometer className="w-3 h-3" /> 1013 hPa
+                    </div>
+                    <div>
+                        <span className="opacity-70">☀ 07:45</span> <span className="mx-1"></span> <span className="opacity-70">🌙 18:35</span>
+                    </div>
+                </div>
+                <div className="text-center text-[10px] text-gray-500 -mt-6 mb-10">Duração do dia: 9.5Hr</div>
             </div>
-            <div className="h-[200px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data}>
-                        <defs>
-                            <linearGradient id="colorUv" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#1a365d" stopOpacity={0.8}/>
-                                <stop offset="95%" stopColor="#1a365d" stopOpacity={0}/>
-                            </linearGradient>
-                        </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" strokeOpacity={0.3} />
-                        <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
-                        <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
-                        <Tooltip contentStyle={{borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)', backgroundColor: 'rgba(255, 255, 255, 0.9)'}} />
-                        <Area type="monotone" dataKey="uv" stroke="#1a365d" strokeWidth={2} fillOpacity={1} fill="url(#colorUv)" />
-                    </AreaChart>
-                </ResponsiveContainer>
+
+            {/* Main Weather Icon */}
+            <div className="flex flex-col items-center">
+                <Sun className="w-32 h-32 text-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.4)] animate-pulse-slow" />
+                <div className="text-8xl font-bold text-white mt-4 relative">
+                    23°
+                    <span className="absolute top-2 -right-6 w-3 h-3 border-2 border-white rounded-full"></span>
+                </div>
+                <div className="text-xl font-bold text-white mt-1">Ensolarado</div>
+                <div className="text-sm text-gray-400 mb-2">Sensação: 25°</div>
+                <div className="flex gap-4 text-sm font-medium">
+                    <span className="text-red-400">🌡 H: 24°</span>
+                    <span className="text-blue-400">🌡 L: 19°</span>
+                </div>
+            </div>
+
+            {/* Bottom Forecast */}
+            <div className="mt-8 pt-6 border-t border-white/5 grid grid-cols-4 gap-2">
+                {forecast.map((item, idx) => (
+                    <div key={idx} className="flex flex-col items-center gap-2">
+                        <span className="text-[10px] font-bold text-gray-400 tracking-wider">{item.d}</span>
+                        {item.icon}
+                        <span className="text-[10px] font-bold text-white">{item.temp}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );

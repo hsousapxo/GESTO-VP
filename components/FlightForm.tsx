@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users, MapPin, Hash, Tag, UserCheck } from 'lucide-react';
+import { Save, Trash2, FileText, Plus, Minus, CheckCircle, AlertCircle, Shield, PlaneLanding, PlaneTakeoff, ArrowLeftRight, MessageSquare, Paperclip, Upload, X, File, CheckSquare, Square, Globe, Ban, Printer, Calendar, Edit, Archive, Users, MapPin, Hash, Tag, UserCheck, ArrowRight } from 'lucide-react';
 import { FlightFormData, FlightType, FlightStatus, FlightNature, UserProfile } from '../types';
 import { saveFlight, deleteFlight } from '../services/db';
 
@@ -10,6 +10,7 @@ interface FlightFormProps {
 }
 
 const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUser }) => {
+    const currentYear = new Date().getFullYear();
     const defaultForm: FlightFormData = {
         flightNumber: '',
         flightType: '',
@@ -17,6 +18,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
         status: 'Agendado',
         aircraftType: '',
         gesdocNumber: '',
+        gesdocYear: currentYear >= 2026 ? currentYear : 2026,
         createdBy: '',
         createdByCategory: '',
         
@@ -52,6 +54,9 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
     const [status, setStatus] = useState<{ type: 'success' | 'error', message: string } | null>(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // Generate years 2026-2050
+    const gesdocYears = Array.from({length: 25}, (_, i) => 2026 + i);
 
     useEffect(() => {
         if (initialData) {
@@ -397,29 +402,35 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     </span>
                                 </div>
 
-                                {/* Timings and Type */}
+                                {/* Timings */}
                                 <div className="text-gray-300 text-sm space-y-1">
                                     {(isArrival || isTurnaround) && (
                                         <div className="flex items-center gap-2">
-                                            <PlaneLanding className="w-3.5 h-3.5 text-gray-500" /> 
-                                            <span className="truncate">Che: {formData.scheduleTimeArrival || '--:--'} ({formData.dateArrival ? new Date(formData.dateArrival).toLocaleDateString('pt-PT') : '--/--'})</span>
+                                            <PlaneLanding className="w-3.5 h-3.5 text-blue-400" /> 
+                                            <span className="truncate"><span className="font-bold text-gray-400">Che:</span> {formData.scheduleTimeArrival || '--:--'} <span className="text-xs text-gray-500">({formData.dateArrival ? new Date(formData.dateArrival).toLocaleDateString('pt-PT') : '--/--'})</span></span>
                                         </div>
                                     )}
                                     {(isDeparture || isTurnaround) && (
                                         <div className="flex items-center gap-2">
-                                            <PlaneTakeoff className="w-3.5 h-3.5 text-gray-500" /> 
-                                            <span className="truncate">Par: {formData.scheduleTimeDeparture || '--:--'} ({formData.dateDeparture ? new Date(formData.dateDeparture).toLocaleDateString('pt-PT') : '--/--'})</span>
+                                            <PlaneTakeoff className="w-3.5 h-3.5 text-orange-400" /> 
+                                            <span className="truncate"><span className="font-bold text-gray-400">Par:</span> {formData.scheduleTimeDeparture || '--:--'} <span className="text-xs text-gray-500">({formData.dateDeparture ? new Date(formData.dateDeparture).toLocaleDateString('pt-PT') : '--/--'})</span></span>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Route */}
-                                <div className="flex items-center gap-2 text-sm text-gray-400 font-medium">
-                                    <MapPin className="w-3.5 h-3.5 text-blue-400" />
+                                <div className="flex items-center gap-2 text-sm text-gray-400 font-medium mt-1">
+                                    <MapPin className="w-3.5 h-3.5 text-gray-500" />
                                     <span>
-                                        {isArrival ? `${formData.origin} → LPPS` : 
-                                         isDeparture ? `LPPS → ${formData.destination}` : 
-                                         `${formData.origin} → ${formData.destination}`}
+                                        {isTurnaround ? (
+                                            <span className="flex items-center gap-1">
+                                                {formData.origin} <ArrowRight className="w-3 h-3" /> LPPS <ArrowRight className="w-3 h-3" /> {formData.destination}
+                                            </span>
+                                        ) : isArrival ? (
+                                            `${formData.origin} → LPPS`
+                                        ) : (
+                                            `LPPS → ${formData.destination}`
+                                        )}
                                     </span>
                                 </div>
 
@@ -428,7 +439,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     {formData.gesdocNumber && (
                                         <div className="bg-white/10 px-2 py-1 rounded text-[10px] text-gray-300 border border-white/10 flex items-center gap-1" title="Número Gesdoc">
                                             <Hash className="w-3 h-3 text-white" />
-                                            <span className="font-bold text-white">GESDOC:</span> {formData.gesdocNumber}
+                                            <span className="font-bold text-white">GESDOC:</span> {formData.gesdocNumber}/{formData.gesdocYear}
                                         </div>
                                     )}
 
@@ -528,40 +539,65 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
 
             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-5 border border-gray-100 dark:border-gray-700 max-w-6xl mx-auto transition-colors">
                 
-                {/* Compact Header */}
-                <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100 dark:border-gray-700">
-                    <div className="flex items-center gap-3">
-                        <Shield className={`w-8 h-8 ${formData.status === 'Realizado' ? 'text-blue-600' : 'text-primary dark:text-blue-500'}`} />
-                        <div>
-                            <h1 className="text-lg font-bold text-primary dark:text-blue-400 leading-none">
-                                {initialData ? `Editar Voo ${initialData.flightNumber}` : 'Ficha de Controlo de Voo Privado'}
-                            </h1>
-                            <span className="text-[10px] text-gray-500 uppercase tracking-wider">ESACFPS / DSAM</span>
-                        </div>
+                {/* Custom PSP Header Layout */}
+                <div className="flex flex-col md:flex-row items-center justify-between mb-8 pb-4 border-b-2 border-gray-100 dark:border-gray-700 gap-4">
+                    
+                    {/* LEFT: PSP Logo & Unit */}
+                    <div className="flex items-center gap-4 w-full md:w-1/3">
+                         <div className="w-14 h-14 bg-[#0e2c6c] rounded-full flex items-center justify-center shadow-md flex-shrink-0 border-2 border-white dark:border-gray-600 relative overflow-hidden">
+                            {/* Simple CSS shape or Lucide Shield to simulate PSP logo */}
+                             <div className="absolute inset-0 border-[3px] border-red-600 rounded-full opacity-20"></div>
+                            <Shield className="w-8 h-8 text-white" fill="currentColor" />
+                         </div>
+                         <div className="flex flex-col">
+                            <span className="text-sm font-black text-[#0e2c6c] dark:text-blue-400 leading-tight">POLÍCIA SEGURANÇA PÚBLICA</span>
+                            <span className="text-xs font-bold text-gray-600 dark:text-gray-400 tracking-wider mt-0.5">ESACFPS / DSAM - PF008</span>
+                         </div>
                     </div>
-                    <div className="flex gap-2 items-center">
-                        {initialData && (
-                            <button 
-                                onClick={() => {
-                                    if(onClear) onClear();
-                                    setFormData(defaultForm);
-                                }}
-                                className="mr-2 text-xs text-gray-500 hover:text-red-500 underline"
-                            >
-                                Cancelar Edição
-                            </button>
+
+                    {/* CENTER: Title */}
+                    <div className="w-full md:w-1/3 text-center">
+                        <h1 className="text-xl md:text-2xl font-black text-gray-800 dark:text-white uppercase tracking-tight leading-tight">
+                            Ficha de Controlo de <br/> Voo Privado
+                        </h1>
+                         {initialData && (
+                            <div className="inline-block bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full text-[10px] text-blue-600 dark:text-blue-400 font-bold mt-2 border border-blue-100 dark:border-blue-800">
+                                MODO DE EDIÇÃO: {initialData.flightNumber}
+                            </div>
                         )}
-                        <div className={`px-3 py-1 rounded text-xs font-bold border transition-colors flex items-center gap-2 ${getHeaderBadgeClass()}`}>
-                            <span>Registo Gesdoc:</span>
-                            <input 
-                                type="text"
-                                className="bg-transparent border-b border-current outline-none w-24 text-center placeholder-current/50 focus:border-current"
-                                placeholder="N.º"
-                                value={formData.gesdocNumber || ''}
-                                onChange={(e) => updateField('gesdocNumber', e.target.value)}
-                            />
+                    </div>
+
+                    {/* RIGHT: Gesdoc & Status */}
+                    <div className="w-full md:w-1/3 flex flex-col items-end justify-center gap-2">
+                        <div className="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-600 flex items-center gap-3">
+                             <div className="text-right">
+                                <span className="block text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Registo GESDOC</span>
+                                <span className="block text-xl font-mono font-bold text-[#0e2c6c] dark:text-white leading-none">
+                                    {formData.gesdocNumber ? `${formData.gesdocNumber}/${formData.gesdocYear}` : '---/----'}
+                                </span>
+                             </div>
+                             <div className="h-8 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
+                             <Hash className="w-6 h-6 text-gray-400" />
+                        </div>
+                        
+                        <div className="flex items-center gap-2 mt-1">
+                             {initialData && (
+                                <button 
+                                    onClick={() => {
+                                        if(onClear) onClear();
+                                        setFormData(defaultForm);
+                                    }}
+                                    className="text-xs text-red-500 hover:text-red-600 hover:underline font-bold mr-2 transition-colors"
+                                >
+                                    Cancelar
+                                </button>
+                            )}
+                            <span className={`px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wider shadow-sm ${getHeaderBadgeClass()}`}>
+                                {formData.status}
+                            </span>
                         </div>
                     </div>
+
                 </div>
 
                 <form onSubmit={handleSubmit}>
@@ -572,23 +608,50 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                         {renderInput("Aeronave", "aircraftType", "text", "Cessna 172", false, true)}
                         {renderInput("Companhia Aérea / Operadora", "operator", "text", "NetJets", false, true)}
                         
-                        <div className="space-y-1">
-                            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status</label>
-                            <select 
-                                className={`w-full px-3 py-1.5 text-sm border rounded-md outline-none focus:ring-1 focus:ring-primary font-bold ${
-                                    formData.status === 'Realizado' ? 'bg-blue-50 text-blue-700 border-blue-300' :
-                                    formData.status === 'Confirmado' ? 'bg-green-50 text-green-700 border-green-300' :
-                                    formData.status === 'Cancelado' ? 'bg-red-50 text-red-700 border-red-300' :
-                                    'bg-yellow-50 text-yellow-700 border-yellow-300'
-                                }`}
-                                value={formData.status}
-                                onChange={(e) => updateField('status', e.target.value)}
-                            >
-                                <option value="Agendado">Agendado</option>
-                                <option value="Confirmado">Confirmado</option>
-                                <option value="Realizado">Realizado</option>
-                                <option value="Cancelado">Cancelado</option>
-                            </select>
+                        <div className="flex flex-col gap-3">
+                            <div className="space-y-1">
+                                <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status</label>
+                                <select 
+                                    className={`w-full px-3 py-1.5 text-sm border rounded-md outline-none focus:ring-1 focus:ring-primary font-bold ${
+                                        formData.status === 'Realizado' ? 'bg-blue-50 text-blue-700 border-blue-300' :
+                                        formData.status === 'Confirmado' ? 'bg-green-50 text-green-700 border-green-300' :
+                                        formData.status === 'Cancelado' ? 'bg-red-50 text-red-700 border-red-300' :
+                                        'bg-yellow-50 text-yellow-700 border-yellow-300'
+                                    }`}
+                                    value={formData.status}
+                                    onChange={(e) => updateField('status', e.target.value)}
+                                >
+                                    <option value="Agendado">Agendado</option>
+                                    <option value="Confirmado">Confirmado</option>
+                                    <option value="Realizado">Realizado</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
+
+                            {/* GESDOC Field */}
+                            <div className="p-2 bg-yellow-50 dark:bg-yellow-900/10 rounded-md border border-yellow-200 dark:border-yellow-800/30">
+                                <label className="text-[10px] font-bold text-yellow-700 dark:text-yellow-500 uppercase flex items-center gap-1 mb-1">
+                                    <Hash className="w-3 h-3" /> GESDOC
+                                </label>
+                                <div className="flex gap-1">
+                                    <input 
+                                        type="text"
+                                        className="w-full px-2 py-1 text-xs border border-yellow-300 dark:border-yellow-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-yellow-500"
+                                        placeholder="N.º Registo"
+                                        value={formData.gesdocNumber || ''}
+                                        onChange={(e) => updateField('gesdocNumber', e.target.value)}
+                                    />
+                                    <select 
+                                        className="w-20 px-1 py-1 text-xs border border-yellow-300 dark:border-yellow-700 rounded bg-white dark:bg-gray-800 text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-yellow-500"
+                                        value={formData.gesdocYear}
+                                        onChange={(e) => updateField('gesdocYear', parseInt(e.target.value))}
+                                    >
+                                        {gesdocYears.map(year => (
+                                            <option key={year} value={year}>{year}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

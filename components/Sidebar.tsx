@@ -11,7 +11,7 @@ import {
     Phone, 
     Bell, 
     Calendar, 
-    LogOut,
+    LogOut, 
     FolderOpen, 
     BookOpen, 
     FileText, 
@@ -39,7 +39,8 @@ import {
     FlaskConical,
     MonitorPlay,
     PanelLeftClose,
-    PanelLeftOpen
+    PanelLeftOpen,
+    CloudSun
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -137,6 +138,70 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         active={currentView === 'flight-list'}
                         onClick={() => onChangeView('flight-list')}
                         isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Meteorologia" 
+                    icon={<CloudSun className="w-4 h-4 text-blue-300" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                >
+                    <MenuItem 
+                        icon={<CloudSun />} 
+                        label="Clima" 
+                        active={currentView === 'weather'}
+                        onClick={() => onChangeView('weather')}
+                        isCollapsed={isCollapsed}
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Estatísticas" 
+                    icon={<BarChart className="w-4 h-4 text-purple-400" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-purple-400 font-bold"
+                >
+                    <MenuItem 
+                        icon={<PieChart />} 
+                        label="Painel Geral" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                </MenuSection>
+
+                <MenuSection 
+                    title="Relatórios" 
+                    icon={<ClipboardList className="w-4 h-4 text-green-400" />} 
+                    defaultOpen={false}
+                    isCollapsed={isCollapsed}
+                    onExpand={handleExpand}
+                    titleClassName="text-green-400 font-bold"
+                >
+                    <MenuItem 
+                        icon={<FileText />} 
+                        label="Relatório Turno" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<LineChart />} 
+                        label="Relatório Semanal" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
+                    />
+                    <MenuItem 
+                        icon={<BarChart />} 
+                        label="Relatório Mensal" 
+                        active={currentView === 'statistics'} 
+                        onClick={() => onChangeView('statistics')} 
+                        isCollapsed={isCollapsed} 
                     />
                 </MenuSection>
 
@@ -292,17 +357,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         onClick={() => onChangeView('procedures')}
                         isCollapsed={isCollapsed}
                     />
-
-                    {!isCollapsed && (
-                        <div className="px-4 pt-4 pb-1">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Relatórios
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem icon={<ClipboardList />} label="Relatório Turno" isCollapsed={isCollapsed} />
-                    <MenuItem icon={<LineChart />} label="Relatório Semanal" isCollapsed={isCollapsed} />
-                    <MenuItem icon={<BarChart />} label="Relatório Mensal" isCollapsed={isCollapsed} />
                 </MenuSection>
 
                 <MenuSection 
@@ -393,11 +447,11 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaul
         <div className="mb-2">
             <button 
                 onClick={handleHeaderClick}
-                className={`w-full flex items-center px-4 py-3 text-gray-400 hover:text-white hover:bg-white/10 transition-colors group select-none ${isCollapsed ? 'justify-center' : 'justify-between'}`}
+                className={`w-full flex items-center px-4 py-3 text-white font-bold hover:text-gray-200 hover:bg-white/10 transition-colors group select-none ${isCollapsed ? 'justify-center' : 'justify-between'}`}
                 title={isCollapsed ? title : ''}
             >
                 <div className="flex items-center gap-3">
-                    <span className={`transition-colors ${isOpen && !isCollapsed ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                    <span className={`transition-colors ${isOpen && !isCollapsed ? 'text-blue-400' : 'text-gray-400 group-hover:text-white'}`}>
                         {icon}
                     </span>
                     {!isCollapsed && (
@@ -407,7 +461,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaul
                     )}
                 </div>
                 {!isCollapsed && (
-                    isOpen ? <ChevronDown className="w-4 h-4 text-gray-500" /> : <ChevronRight className="w-4 h-4 text-gray-600" />
+                    isOpen ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />
                 )}
             </button>
             <div 
@@ -431,14 +485,14 @@ const MenuItem: React.FC<{
 }> = ({ icon, label, active, className = '', onClick, isCollapsed }) => (
     <button 
         onClick={onClick}
-        className={`w-full flex items-center px-4 py-3 cursor-pointer transition-colors text-sm font-medium 
-        ${active ? 'bg-secondary dark:bg-blue-900 border-l-4 border-blue-400' : 'hover:bg-white/10 border-l-4 border-transparent'} 
+        className={`w-full flex items-center px-4 py-3 cursor-pointer transition-colors text-sm font-bold text-white
+        ${active ? 'bg-secondary dark:bg-blue-900 border-l-4 border-blue-400' : 'hover:bg-white/10 border-l-4 border-transparent opacity-80 hover:opacity-100'} 
         ${className}
         ${isCollapsed ? 'justify-center border-l-0 px-2' : ''}
         `}
         title={isCollapsed ? label : ''}
     >
-        <span className={`w-6 h-6 flex items-center justify-center opacity-90 ${!isCollapsed ? 'mr-3' : ''}`}>{icon}</span>
+        <span className={`w-6 h-6 flex items-center justify-center ${!isCollapsed ? 'mr-3' : ''}`}>{icon}</span>
         {!isCollapsed && <span>{label}</span>}
     </button>
 );

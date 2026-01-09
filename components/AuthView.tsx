@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { Shield, User, Briefcase, ArrowRight, Lock } from 'lucide-react';
+import { Shield, User, Briefcase, ArrowRight, Lock, Sun, Moon } from 'lucide-react';
 import { UserProfile } from '../types';
 
 interface AuthViewProps {
     onLogin: (user: UserProfile) => void;
+    darkMode?: boolean;
+    toggleDarkMode?: () => void;
 }
 
-const AuthView: React.FC<AuthViewProps> = ({ onLogin }) => {
+const AuthView: React.FC<AuthViewProps> = ({ onLogin, darkMode, toggleDarkMode }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [category, setCategory] = useState('Agente');
@@ -23,19 +25,30 @@ const AuthView: React.FC<AuthViewProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex flex-col items-center justify-center p-4 relative overflow-hidden transition-colors duration-200">
             {/* Background decoration */}
             <div className="absolute inset-0 z-0 opacity-10">
                  <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2074&auto=format&fit=crop')] bg-cover bg-center"></div>
                  <div className="absolute inset-0 bg-primary/80 mix-blend-multiply"></div>
             </div>
 
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-300">
+            {/* Dark Mode Toggle */}
+            {toggleDarkMode && (
+                <button 
+                    onClick={toggleDarkMode}
+                    className="absolute top-6 right-6 z-50 bg-white/80 dark:bg-gray-800/80 p-3 rounded-full shadow-lg backdrop-blur-sm hover:scale-105 transition-transform text-primary dark:text-blue-400"
+                    title="Alternar Tema"
+                >
+                    {darkMode ? <Sun className="w-6 h-6" /> : <Moon className="w-6 h-6" />}
+                </button>
+            )}
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-8 relative z-10 border border-gray-200 dark:border-gray-700 animate-in fade-in zoom-in duration-300 transition-colors">
                 <div className="flex flex-col items-center mb-8">
-                    <div className="w-20 h-20 bg-primary dark:bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg mb-4 transform rotate-3">
+                    <div className="w-20 h-20 bg-primary dark:bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg mb-4 transform rotate-3 transition-colors">
                         <Shield className="w-10 h-10 text-white" />
                     </div>
-                    <h1 className="text-2xl font-bold text-primary dark:text-blue-400 text-center">GESTO VP</h1>
+                    <h1 className="text-2xl font-bold text-primary dark:text-blue-400 text-center transition-colors">GESTO VP</h1>
                     <p className="text-gray-500 dark:text-gray-400 text-sm font-medium mt-1">ESACFPS / DSAM - PF008</p>
                 </div>
 

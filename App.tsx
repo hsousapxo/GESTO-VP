@@ -14,6 +14,8 @@ import CalendarMonthlyView from './components/CalendarMonthlyView';
 import CalendarAnnualView from './components/CalendarAnnualView';
 import RemindersView from './components/RemindersView';
 import FlightTracker from './components/FlightTracker';
+import StatisticsView from './components/StatisticsView';
+import WeatherView from './components/clima/WeatherView';
 import { ViewState, UserProfile, FlightFormData } from './types';
 
 function App() {
@@ -83,10 +85,14 @@ function App() {
                 return <FlightList onEdit={handleEditFlight} />;
             case 'flight-tracker':
                 return <FlightTracker />;
+            case 'statistics':
+                return <StatisticsView />;
             case 'ai-assistant':
                 return <AiAssistant />;
             case 'ai-image-editor':
                 return <AiImageEditor />;
+            case 'weather':
+                return <WeatherView />;
             case 'templates':
                 return <TemplatesView />;
             case 'legislation':
@@ -104,17 +110,17 @@ function App() {
         }
     };
 
-    // If no user is logged in, show AuthView
+    // If no user is logged in, show AuthView with dark mode toggle capability
     if (!user) {
         return (
             <div className={darkMode ? 'dark' : ''}>
-                <AuthView onLogin={handleLogin} />
+                <AuthView onLogin={handleLogin} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
             </div>
         );
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+        <div className="flex h-screen overflow-hidden bg-[#0a0e17] dark:bg-[#0a0e17] text-white transition-colors duration-200 font-sans">
             {/* Sidebar Overlay for Mobile */}
             {sidebarOpen && (
                 <div 
@@ -134,7 +140,7 @@ function App() {
                 onLogout={handleLogout}
             />
 
-            <div className="flex-1 flex flex-col min-w-0">
+            <div className="flex-1 flex flex-col min-w-0 bg-[#0a0e17]">
                 <Topbar 
                     onToggleSidebar={handleToggleSidebar} 
                     darkMode={darkMode}
@@ -142,7 +148,7 @@ function App() {
                     onChangeView={setCurrentView}
                     user={user}
                 />
-                <main className="flex-1 overflow-y-auto">
+                <main className="flex-1 overflow-y-auto custom-scrollbar">
                     {renderContent()}
                 </main>
             </div>

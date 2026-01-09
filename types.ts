@@ -28,6 +28,7 @@ export interface FlightFormData {
     
     // Gesdoc
     gesdocNumber?: string;
+    gesdocYear?: number;
     
     // Arrival Data
     regVPArrival?: string;
@@ -80,6 +81,8 @@ export type ViewState =
     | 'flight-form' 
     | 'flight-list'
     | 'flight-tracker' 
+    | 'statistics'
+    | 'weather'
     | 'templates' 
     | 'legislation' 
     | 'procedures'
