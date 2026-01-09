@@ -19,7 +19,8 @@ import {
     Archive,
     Trash2,
     MoreHorizontal,
-    Users
+    Users,
+    RotateCcw
 } from 'lucide-react';
 import { ViewState, FlightFormData, FlightType } from '../types';
 import { getFlights } from '../services/db';
@@ -48,7 +49,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onChangeView }) => {
 
                 {/* Right Column (Span 1) - Weather/Clock Card */}
                 <div className="lg:col-span-1 h-full">
-                    <WeatherClockWidget />
+                    <WeatherClockWidget onClick={() => onChangeView?.('weather')} />
                 </div>
             </div>
 
@@ -156,40 +157,106 @@ const MonthlySummaryFooter: React.FC<{ flights: FlightFormData[] }> = ({ flights
     );
 };
 
-// --- Widget: Week Calendar (Cloned Style) ---
+// --- Widget: Week Calendar (Functional Logic) ---
+
+// Helpers for date manipulation
+const getStartOfWeek = (date: Date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    return new Date(d.setDate(diff));
+};
+
+const getWeekNumber = (d: Date) => {
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7;
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+    return Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+};
 
 const WeekCalendarWidget: React.FC = () => {
-    const days = [
-        { w: 'SEG', d: 5, active: false, alert: false },
-        { w: 'TER', d: 6, active: false, alert: true }, // Red dot
-        { w: 'QUA', d: 7, active: false, alert: false },
-        { w: 'QUI', d: 8, active: true, alert: false }, // Active Blue
-        { w: 'SEX', d: 9, active: false, alert: false },
-        { w: 'SÁB', d: 10, active: false, alert: false }, // Yellow text in image implies weekend?
-        { w: 'DOM', d: 11, active: false, alert: false }, // Yellow text
-    ];
+    const [currentDate, setCurrentDate] = useState(new Date());
+
+    const startOfWeek = getStartOfWeek(currentDate);
+    const weekNumber = getWeekNumber(startOfWeek);
+    const today = new Date();
+
+    const changeWeek = (direction: 'prev' | 'next') => {
+        const newDate = new Date(currentDate);
+        newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+        setCurrentDate(newDate);
+    };
+
+    const resetToToday = () => {
+        setCurrentDate(new Date());
+    };
+
+    // Generate 7 days for current view
+    const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(startOfWeek);
+        d.setDate(d.getDate() + i);
+        
+        const isToday = d.getDate() === today.getDate() && 
+                        d.getMonth() === today.getMonth() && 
+                        d.getFullYear() === today.getFullYear();
+        
+        // Mock alert logic: Randomly show alert if it's not today (just for visuals)
+        // Using date number to keep it consistent without re-rendering randoms
+        const hasAlert = !isToday && (d.getDate() % 5 === 0);
+
+        return {
+            w: d.toLocaleDateString('pt-PT', { weekday: 'short' }).toUpperCase().replace('.', ''),
+            d: d.getDate(),
+            active: isToday,
+            alert: hasAlert,
+            isWeekend: i >= 5 // 5=Sat, 6=Sun in this 0-based index from Monday
+        };
+    });
+
+    const monthLabel = startOfWeek.toLocaleDateString('pt-PT', { month: 'long', year: 'numeric' });
 
     return (
-        <div className="bg-[#131b2e] rounded-[32px] p-8 border border-white/5 relative overflow-hidden">
+        <div className="bg-[#131b2e] rounded-[32px] p-8 border border-white/5 relative overflow-hidden transition-all">
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
 
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                    Semana N.º 2
-                </h3>
-                <div className="flex gap-2">
-                    <button className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"><ChevronLeft className="w-5 h-5" /></button>
-                    <button className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"><ChevronRight className="w-5 h-5" /></button>
+                <div>
+                    <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                        Semana N.º {weekNumber}
+                    </h3>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider font-bold">{monthLabel}</p>
+                </div>
+                
+                <div className="flex gap-2 items-center">
+                    <button 
+                        onClick={resetToToday}
+                        className="p-1.5 hover:bg-white/10 rounded-full text-blue-400 hover:text-white transition-colors mr-1"
+                        title="Voltar a Hoje"
+                    >
+                        <RotateCcw className="w-4 h-4" />
+                    </button>
+                    <button 
+                        onClick={() => changeWeek('prev')}
+                        className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button 
+                        onClick={() => changeWeek('next')}
+                        className="p-1 hover:bg-white/10 rounded-full text-gray-400 transition-colors"
+                    >
+                        <ChevronRight className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-7 gap-2">
                 {days.map((day, idx) => {
-                    const isWeekend = day.w === 'SÁB' || day.w === 'DOM';
                     return (
                         <div key={idx} className="flex flex-col items-center gap-3 group cursor-pointer">
-                            <span className={`text-[10px] font-bold tracking-wider ${isWeekend ? 'text-yellow-500' : 'text-gray-400'}`}>
+                            <span className={`text-[10px] font-bold tracking-wider ${day.isWeekend ? 'text-yellow-500' : 'text-gray-400'}`}>
                                 {day.w}
                             </span>
                             
@@ -303,6 +370,7 @@ const NextEventsWidget: React.FC<{ flights: FlightFormData[] }> = ({ flights }) 
                             <div className="overflow-hidden">
                                 <h4 className="text-white font-bold text-sm truncate">{item.title}</h4>
                                 <div className="flex items-center gap-2 text-xs text-gray-400">
+                                    <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
                                     <span className={item.time === 'Agora' ? 'text-red-400 font-bold' : ''}>{item.time}</span>
                                     <span className="w-1 h-1 bg-gray-600 rounded-full"></span>
                                     <span className="truncate max-w-[150px]">{item.desc}</span>
@@ -325,8 +393,13 @@ const NextEventsWidget: React.FC<{ flights: FlightFormData[] }> = ({ flights }) 
 
 // --- Widget: Weather & Clock (Cloned Vertical Card) ---
 
-const WeatherClockWidget: React.FC = () => {
+const WeatherClockWidget: React.FC<{ onClick?: () => void }> = ({ onClick }) => {
     const [location, setLocation] = useState<'PXO' | 'FNC'>('PXO');
+
+    const handleToggle = (e: React.MouseEvent, loc: 'PXO' | 'FNC') => {
+        e.stopPropagation();
+        setLocation(loc);
+    };
 
     // Forecast Data
     const forecast = [
@@ -337,30 +410,26 @@ const WeatherClockWidget: React.FC = () => {
     ];
 
     return (
-        <div className="h-full bg-gradient-to-b from-[#131b2e] to-[#0a0f1d] rounded-[32px] p-8 border border-white/5 relative flex flex-col justify-between overflow-hidden">
+        <div 
+            onClick={onClick}
+            className="h-full bg-gradient-to-b from-[#131b2e] to-[#0a0f1d] rounded-[32px] p-8 border border-white/5 relative flex flex-col justify-between overflow-hidden cursor-pointer hover:border-white/20 transition-all group"
+        >
              {/* Background Effects */}
-             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/10 rounded-full blur-[80px] pointer-events-none"></div>
+             <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-64 h-64 bg-yellow-500/10 rounded-full blur-[80px] pointer-events-none transition-all group-hover:bg-yellow-500/20"></div>
 
             {/* Header */}
             <div>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h2 className="text-xl font-bold text-white leading-tight w-3/4">Quinta-feira, 8 de janeiro de 2026</h2>
-                        <div className="flex items-center gap-1.5 text-gray-400 text-sm mt-1">
-                            <MapPin className="w-4 h-4" />
-                            <span>Porto Santo ({location})</span>
-                        </div>
-                    </div>
+                <div className="flex justify-end items-start">
                     {/* Toggle */}
-                    <div className="flex bg-black/30 p-1 rounded-lg border border-white/5">
+                    <div className="flex bg-black/30 p-1 rounded-lg border border-white/5 z-10">
                         <button 
-                            onClick={() => setLocation('PXO')}
+                            onClick={(e) => handleToggle(e, 'PXO')}
                             className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${location === 'PXO' ? 'bg-white text-black' : 'text-gray-500'}`}
                         >
                             PXO
                         </button>
                         <button 
-                            onClick={() => setLocation('FNC')}
+                            onClick={(e) => handleToggle(e, 'FNC')}
                             className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${location === 'FNC' ? 'bg-white text-black' : 'text-gray-500'}`}
                         >
                             FNC
@@ -390,7 +459,7 @@ const WeatherClockWidget: React.FC = () => {
 
             {/* Main Weather Icon */}
             <div className="flex flex-col items-center">
-                <Sun className="w-32 h-32 text-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.4)] animate-pulse-slow" />
+                <Sun className="w-32 h-32 text-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.4)] animate-pulse-slow group-hover:scale-110 transition-transform duration-500" />
                 <div className="text-8xl font-bold text-white mt-4 relative">
                     23°
                     <span className="absolute top-2 -right-6 w-3 h-3 border-2 border-white rounded-full"></span>

@@ -116,7 +116,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={true}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
-                    titleClassName="text-red-500 font-extrabold"
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<Radar />} 
@@ -147,6 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<CloudSun />} 
@@ -163,7 +164,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
-                    titleClassName="text-purple-400 font-bold"
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<PieChart />} 
@@ -180,7 +181,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
-                    titleClassName="text-green-400 font-bold"
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<FileText />} 
@@ -211,6 +212,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<Bot />} 
@@ -234,6 +236,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem 
                         icon={<CalendarDays />} 
@@ -264,7 +267,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
-                    titleClassName="text-yellow-500 font-extrabold"
+                    titleClassName="text-white font-bold"
                 >
                      <MenuItem 
                         icon={<Files />} 
@@ -365,6 +368,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
+                    titleClassName="text-white font-bold"
                 >
                     <MenuItem icon={<Phone />} label="Lista Telefónica" isCollapsed={isCollapsed} />
                     <MenuItem icon={<Bell />} label="Piquetes / Urgências" isCollapsed={isCollapsed} />
@@ -376,7 +380,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
                     onExpand={handleExpand}
-                    titleClassName="font-extrabold text-white"
+                    titleClassName="text-white font-bold"
                 >
                     {!isCollapsed && (
                         <div className="px-4 pt-3 pb-1">
