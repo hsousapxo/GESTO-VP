@@ -33,7 +33,16 @@ import {
     ChevronRight, 
     Flag, 
     Lock, 
-    Search as SearchIcon 
+    Search as SearchIcon,
+    Stamp,
+    ClipboardCheck,
+    Hand,
+    FileWarning,
+    Baby,
+    Mail,
+    ShieldAlert,
+    UserX,
+    ClipboardEdit
 } from 'lucide-react';
 
 const GenericReportPlaceholder: React.FC<{ title: string, icon: React.ReactNode }> = ({ title, icon }) => (
@@ -42,7 +51,7 @@ const GenericReportPlaceholder: React.FC<{ title: string, icon: React.ReactNode 
             {icon}
         </div>
         <h2 className="text-3xl font-bold text-white mb-2">{title}</h2>
-        <p className="text-gray-500 max-w-md mb-8">Esta secção permite a gestão e descarga dos modelos oficiais do relatório {title.toLowerCase()}.</p>
+        <p className="text-gray-500 max-w-md mb-8">Esta secção permite a gestão e consulta do documento {title.toLowerCase()}.</p>
         <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-50 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-blue-900/40">
             <Download className="w-5 h-5" />
             DESCARREGAR MODELO
@@ -164,6 +173,22 @@ function App() {
             case 'report-pulsar': return <GenericReportPlaceholder title="Relatório Pulsar" icon={<Activity className="w-10 h-10" />} />;
             case 'report-eurosur': return <GenericReportPlaceholder title="Relatório Eurosur" icon={<Globe className="w-10 h-10" />} />;
             case 'report-ramfa': return <GenericReportPlaceholder title="Relatório RAMFA" icon={<FileSpreadsheet className="w-10 h-10" />} />;
+            
+            // Novos Modelos e Formulários
+            case 'template-infocest': return <GenericReportPlaceholder title="Modelos Infocest" icon={<FileText className="w-10 h-10" />} />;
+            case 'template-carimbos': return <GenericReportPlaceholder title="Modelo Carimbos" icon={<Stamp className="w-10 h-10" />} />;
+            case 'template-decl-entrada': return <GenericReportPlaceholder title="Modelo Declaração de Entrada" icon={<ClipboardCheck className="w-10 h-10" />} />;
+            case 'template-intercecoes': return <GenericReportPlaceholder title="Modelo Interceções" icon={<Hand className="w-10 h-10" />} />;
+            case 'template-notif-abandono': return <GenericReportPlaceholder title="Modelo Abandono Voluntário" icon={<FileWarning className="w-10 h-10" />} />;
+            
+            // Novos Procedimentos Operacionais
+            case 'proc-menores': return <GenericReportPlaceholder title="Controlo de Menores" icon={<Baby className="w-10 h-10" />} />;
+            case 'proc-emails': return <GenericReportPlaceholder title="Envio de Emails" icon={<Mail className="w-10 h-10" />} />;
+            case 'proc-intercecoes': return <GenericReportPlaceholder title="Interceções" icon={<ShieldAlert className="w-10 h-10" />} />;
+            case 'proc-extravio': return <GenericReportPlaceholder title="Extravio Passaporte" icon={<FileWarning className="w-10 h-10" />} />;
+            case 'proc-recusa': return <GenericReportPlaceholder title="Recusa de Entrada" icon={<UserX className="w-10 h-10" />} />;
+            case 'proc-decl-entrada': return <GenericReportPlaceholder title="Declaração de Entrada" icon={<ClipboardEdit className="w-10 h-10" />} />;
+
             case 'ai-assistant': return <AiAssistant />;
             case 'ai-image-editor': return <AiImageEditor />;
             case 'weather': return <WeatherView />;

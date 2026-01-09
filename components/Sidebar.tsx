@@ -48,7 +48,15 @@ import {
     Activity,
     FileSpreadsheet,
     Layers,
-    Library
+    Library,
+    FileWarning,
+    Hand,
+    ClipboardCheck,
+    Mail,
+    Baby,
+    ShieldAlert,
+    UserX,
+    ClipboardEdit
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -106,8 +114,59 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
             <div className="flex-1 overflow-y-auto py-5 custom-scrollbar h-[calc(100vh-81px)]">
                 
                 {/* GS PF008 Section */}
-                <MenuSection title="GS PF008" icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
-                    <MenuItem icon={<Files />} label="Modelos e Formulários" active={currentView === 'templates'} onClick={() => onChangeView('templates')} isCollapsed={isCollapsed} />
+                <MenuSection title="GS PF008" icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    
+                    {/* Folder: Modelos e Formulários */}
+                    <SubMenu label="Modelos e Formulários" icon={<Files className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<FileText className="w-3.5 h-3.5" />} 
+                            label="Modelos Infocest" 
+                            active={currentView === 'template-infocest'} 
+                            onClick={() => onChangeView('template-infocest')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Stamp className="w-3.5 h-3.5" />} 
+                            label="Modelo Carimbos" 
+                            active={currentView === 'template-carimbos'} 
+                            onClick={() => onChangeView('template-carimbos')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<ClipboardCheck className="w-3.5 h-3.5" />} 
+                            label="Modelo Declaração de Entrada" 
+                            active={currentView === 'template-decl-entrada'} 
+                            onClick={() => onChangeView('template-decl-entrada')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Hand className="w-3.5 h-3.5" />} 
+                            label="Modelo Interceções" 
+                            active={currentView === 'template-intercecoes'} 
+                            onClick={() => onChangeView('template-intercecoes')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<FileWarning className="w-3.5 h-3.5" />} 
+                            label="Modelo Abandono Voluntário" 
+                            active={currentView === 'template-notif-abandono'} 
+                            onClick={() => onChangeView('template-notif-abandono')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Layers className="w-3.5 h-3.5 opacity-50" />} 
+                            label="Ver Todos" 
+                            active={currentView === 'templates'} 
+                            onClick={() => onChangeView('templates')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
                     
                     {/* Folder: Leg PF008 */}
                     <SubMenu label="Leg PF008" icon={<BookOpen className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
@@ -129,7 +188,65 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         />
                     </SubMenu>
 
-                    <MenuItem icon={<ClipboardList />} label="Procedimentos" active={currentView === 'procedures'} onClick={() => onChangeView('procedures')} isCollapsed={isCollapsed} />
+                    {/* Folder: Procedimentos */}
+                    <SubMenu label="Procedimentos" icon={<ClipboardList className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<Baby className="w-3.5 h-3.5" />} 
+                            label="Menores" 
+                            active={currentView === 'proc-menores'} 
+                            onClick={() => onChangeView('proc-menores')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Mail className="w-3.5 h-3.5" />} 
+                            label="Envio de Emails" 
+                            active={currentView === 'proc-emails'} 
+                            onClick={() => onChangeView('proc-emails')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<ShieldAlert className="w-3.5 h-3.5" />} 
+                            label="Interceções" 
+                            active={currentView === 'proc-intercecoes'} 
+                            onClick={() => onChangeView('proc-intercecoes')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<FileWarning className="w-3.5 h-3.5" />} 
+                            label="Extravio Passaporte" 
+                            active={currentView === 'proc-extravio'} 
+                            onClick={() => onChangeView('proc-extravio')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<UserX className="w-3.5 h-3.5" />} 
+                            label="Recusa de Entrada" 
+                            active={currentView === 'proc-recusa'} 
+                            onClick={() => onChangeView('proc-recusa')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<ClipboardEdit className="w-3.5 h-3.5" />} 
+                            label="Declaração Entrada" 
+                            active={currentView === 'proc-decl-entrada'} 
+                            onClick={() => onChangeView('proc-decl-entrada')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<ClipboardList className="w-3.5 h-3.5 opacity-50" />} 
+                            label="Todos os SOPs" 
+                            active={currentView === 'procedures'} 
+                            onClick={() => onChangeView('procedures')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
                 </MenuSection>
 
                 {/* Registo de Voos */}
@@ -140,7 +257,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     <MenuItem icon={<Archive />} label="Arquivo Voos" active={currentView === 'flight-archive'} onClick={() => onChangeView('flight-archive')} isCollapsed={isCollapsed} />
                 </MenuSection>
 
-                {/* Relatórios Section - ORGANIZED AS PER REQUEST */}
+                {/* Relatórios Section */}
                 <MenuSection title="Relatórios" icon={<FileText className="w-4 h-4 text-white" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
                     
                     {/* Folder: Relatório Turno */}
@@ -213,6 +330,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 {/* Calendário */}
                 <MenuSection title="Calendário" icon={<Calendar className="w-4 h-4" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
                     <MenuItem icon={<CalendarDays />} label="Vista Mensal" active={currentView === 'calendar-monthly'} onClick={() => onChangeView('calendar-monthly')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<CalendarRange />} label="Vista Anual" active={currentView === 'calendar-annual'} onClick={() => onChangeView('calendar-annual')} isCollapsed={isCollapsed} />
                     <MenuItem icon={<BellRing />} label="Lembretes" active={currentView === 'reminders'} onClick={() => onChangeView('reminders')} isCollapsed={isCollapsed} />
                 </MenuSection>
 
