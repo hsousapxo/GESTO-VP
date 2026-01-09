@@ -11,9 +11,10 @@ export type FlightNature =
     | 'Voo Privado' 
     | 'Voo Militar' 
     | 'Voo Divergido' 
-    | 'Voo de Carga' 
+    | 'Voo Carga' 
     | 'Voo Diplomático' 
-    | 'Voo de Instrução';
+    | 'Voo de Instrução'
+    | 'Voo Comercial';
 
 export interface FlightFormData {
     id?: string;
@@ -24,6 +25,11 @@ export interface FlightFormData {
     flightType: FlightType | ''; // Now includes TURNAROUND
     flightNature: FlightNature | '';
     status: FlightStatus;
+    
+    // Movement specific statuses
+    arrivalStatus?: FlightStatus;
+    departureStatus?: FlightStatus;
+
     aircraftType: string;
     
     // Gesdoc
