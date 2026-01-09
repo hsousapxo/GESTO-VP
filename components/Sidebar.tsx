@@ -61,7 +61,8 @@ import {
     Smartphone,
     ExternalLink,
     Lock,
-    ShieldCheck
+    ShieldCheck,
+    Plane
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -140,6 +141,14 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                                 isCollapsed={isCollapsed}
                                 isSmall
                                 className="!border-l-0 text-blue-300"
+                            />
+                            <MenuItem 
+                                icon={<Plane className="w-3 h-3" />} 
+                                label="Portal Voos Privados" 
+                                onClick={() => openExternalLink('https://portalfronteiras.ssi.local/aplicacoes/voos-privados')}
+                                isCollapsed={isCollapsed}
+                                isSmall
+                                className="!border-l-0 text-sky-300"
                             />
                             <MenuItem 
                                 icon={<ShieldCheck className="w-3 h-3" />} 
