@@ -16,16 +16,22 @@ export type FlightNature =
     | 'Voo de Instrução'
     | 'Voo Comercial';
 
+export type RouteType = 'Schengen' | 'Não Schengen';
+
 export interface FlightFormData {
     id?: string;
     createdAt?: Date;
     createdBy?: string; // Agent Name
     createdByCategory?: string; // Agent Category
     flightNumber: string;
-    flightType: FlightType | ''; // Now includes TURNAROUND
+    flightType: FlightType | ''; 
     flightNature: FlightNature | '';
     status: FlightStatus;
     
+    // Movement specific route classification
+    arrivalRouteType?: RouteType;
+    departureRouteType?: RouteType;
+
     // Movement specific statuses
     arrivalStatus?: FlightStatus;
     departureStatus?: FlightStatus;
@@ -40,7 +46,7 @@ export interface FlightFormData {
     regVPArrival?: string;
     origin: string;
     scheduleTimeArrival: string;
-    dateArrival: string; // Changed from actualTime (Date string YYYY-MM-DD)
+    dateArrival: string; 
     
     // Arrival POB
     arrivalUeCount: number;
@@ -51,7 +57,7 @@ export interface FlightFormData {
     regVPDeparture?: string;
     destination: string;
     scheduleTimeDeparture: string;
-    dateDeparture: string; // Changed from actualTime (Date string YYYY-MM-DD)
+    dateDeparture: string; 
 
     // Departure POB
     departureUeCount: number;
