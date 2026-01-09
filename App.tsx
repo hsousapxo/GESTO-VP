@@ -163,11 +163,12 @@ function App() {
     
     const handleEditFlight = (flight: FlightFormData) => { setEditingFlight(flight); setCurrentView('flight-form'); };
     const handleClearEdit = () => { setEditingFlight(null); };
+    const handleFlightSaved = () => { setEditingFlight(null); setCurrentView('flight-list'); };
     
     const renderContent = () => {
         switch (currentView) {
             case 'dashboard': return <Dashboard onChangeView={setCurrentView} />;
-            case 'flight-form': return <FlightForm initialData={editingFlight} onClear={handleClearEdit} currentUser={user} />;
+            case 'flight-form': return <FlightForm initialData={editingFlight} onClear={handleClearEdit} onSaved={handleFlightSaved} currentUser={user} />;
             case 'flight-list': return <FlightList onEdit={handleEditFlight} title="Voos Agendados" />;
             case 'flight-archive': return <FlightArchiveAnnual />;
             case 'flight-tracker': return <FlightTracker />;
@@ -202,7 +203,9 @@ function App() {
             case 'ai-image-editor': return <AiImageEditor />;
             case 'weather': return <WeatherView />;
             case 'weather-alerts': return <WeatherAlertsView />;
+            // Fixed: removed duplicate airportCode attribute
             case 'weather-pxo': return <WeatherView airportCode="PXO" />;
+            // Fixed: removed duplicate airportCode attribute
             case 'weather-fnc': return <WeatherView airportCode="FNC" />;
             case 'templates': return <TemplatesView />;
             case 'legislation': return <LegislationView />;

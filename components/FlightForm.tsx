@@ -19,7 +19,8 @@ import {
     Plane,
     Globe,
     Shield,
-    FileText
+    FileText,
+    Printer
 } from 'lucide-react';
 import { FlightFormData, FlightType, UserProfile, FlightStatus } from '../types';
 import { saveFlight, deleteFlight } from '../services/db';
@@ -27,10 +28,11 @@ import { saveFlight, deleteFlight } from '../services/db';
 interface FlightFormProps {
     initialData?: FlightFormData | null;
     onClear?: () => void;
+    onSaved?: () => void;
     currentUser?: UserProfile | null;
 }
 
-const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUser }) => {
+const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, currentUser }) => {
     const currentYear = new Date().getFullYear();
     const defaultForm: FlightFormData = {
         flightNumber: '',
@@ -118,7 +120,12 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
             setSavedId(id);
             setFormData(prev => ({ ...prev, id }));
             setStatusMsg({ type: 'success', text: 'Voo registado com sucesso!' });
-            setTimeout(() => setStatusMsg(null), 3000);
+            
+            setTimeout(() => {
+                setStatusMsg(null);
+                if (onSaved) onSaved();
+            }, 800);
+            
         } catch (error) {
             setStatusMsg({ type: 'error', text: 'Erro ao guardar voo.' });
         }
@@ -130,6 +137,10 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
             await deleteFlight(savedId);
             if (onClear) onClear();
         }
+    };
+
+    const handlePrint = () => {
+        window.print();
     };
 
     const checklistItemsArrival = [
@@ -149,13 +160,134 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
 
     return (
         <div className="p-6 bg-[#0a0e17] min-h-full font-sans text-white">
-            <form onSubmit={handleSave} className="max-w-7xl mx-auto space-y-6 pb-24">
+            
+            {/* PRINT TEMPLATE (Hidden on screen) */}
+            <div className="hidden print:block bg-white text-black p-10 font-sans min-h-screen">
+                <div className="border-b-2 border-primary pb-4 mb-8 flex justify-between items-start">
+                    <div>
+                        <h1 className="text-2xl font-black text-primary uppercase tracking-tight">POLÍCIA SEGURANÇA PÚBLICA</h1>
+                        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">DIVISÃO DE SEGURANÇA AEROPORTUÁRIA</p>
+                        <p className="text-[10px] font-bold text-gray-600 uppercase tracking-widest">COMANDO REGIONAL DA MADEIRA</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-2xl font-black mb-1">{formData.flightNumber || '---'}</p>
+                        <p className="text-xs font-bold text-gray-500 mb-2">{new Date().toISOString().split('T')[0]}</p>
+                        <div className="bg-gray-100 px-4 py-2 rounded border border-gray-200">
+                             <p className="text-[10px] font-black text-gray-500 uppercase tracking-tighter">GESDOC n.º</p>
+                             <p className="text-sm font-bold">{formData.gesdocNumber || 'Pendente'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-10">
+                    <h2 className="text-sm font-black text-primary border-b border-gray-200 pb-1 mb-4 uppercase tracking-widest">INFORMAÇÃO GERAL</h2>
+                    <div className="grid grid-cols-2 gap-y-4 gap-x-12">
+                        <div>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase">Operadora</p>
+                            <p className="text-sm font-bold border-b border-gray-100 py-1">{formData.operator || '---'}</p>
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase">Rota</p>
+                            <p className="text-sm font-bold border-b border-gray-100 py-1">{formData.origin || '---'} - {formData.destination || '---'}</p>
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase">Tipo de Voo</p>
+                            <p className="text-sm font-bold border-b border-gray-100 py-1">{formData.flightNature || '---'}</p>
+                        </div>
+                        <div>
+                            <p className="text-[9px] font-bold text-gray-500 uppercase">Registo GESDOC</p>
+                            <p className="text-sm font-bold border-b border-gray-100 py-1">{formData.gesdocNumber || '---'}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-8 mb-10">
+                    <div className="border border-gray-200 rounded-xl p-6">
+                        <h3 className="text-xs font-black text-primary mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">CHEGADA</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Origem</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.origin || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Hora</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.scheduleTimeArrival || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Status</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.arrivalStatus || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">PAX UE / NON-UE</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.arrivalUeCount || 0} / {formData.arrivalNonSchengenCount || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border border-gray-200 rounded-xl p-6">
+                        <h3 className="text-xs font-black text-primary mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">PARTIDA</h3>
+                        <div className="space-y-4">
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Destino</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.destination || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Hora</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.scheduleTimeDeparture || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">Status</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.departureStatus || '---'}</p>
+                            </div>
+                            <div>
+                                <p className="text-[8px] font-bold text-gray-400 uppercase">PAX UE / NON-UE</p>
+                                <p className="text-sm font-bold border-b border-gray-50">{formData.departureUeCount || 0} / {formData.departureNonSchengenCount || 0}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="mb-12">
+                    <h2 className="text-sm font-black text-primary border-b border-gray-200 pb-1 mb-4 uppercase tracking-widest">OBSERVAÇÕES</h2>
+                    <div className="border border-gray-200 rounded-xl p-6 min-h-[150px] text-sm italic text-gray-700">
+                        {formData.observations || 'Sem observações registadas.'}
+                    </div>
+                </div>
+
+                <div className="mt-auto border-t pt-4 flex justify-between items-end">
+                    <div className="text-[9px] text-gray-400 leading-tight">
+                        <p className="font-bold uppercase tracking-wider mb-1 text-gray-500">Rodapé de Segurança</p>
+                        <p>Documento gerado automaticamente pelo Sistema GESTO VP.</p>
+                        <p>Impresso em: {new Date().toLocaleString('pt-PT')}</p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-1">REGISTADO POR</p>
+                        <p className="text-sm font-bold text-primary">{formData.createdBy || 'Sistema'}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">{formData.createdByCategory || 'Agente'}</p>
+                    </div>
+                </div>
+            </div>
+
+            {/* SCREEN VIEW (Original Form) */}
+            <form onSubmit={handleSave} className="max-w-7xl mx-auto space-y-6 pb-24 print:hidden">
                 
                 {/* 1. IDENTIFICAÇÃO DO VOO (Header) */}
                 <div className="bg-[#111827] rounded-[24px] p-6 border border-white/5 shadow-2xl">
-                    <div className="flex items-center gap-3 mb-6 text-blue-400">
-                        <Plane className="w-5 h-5" />
-                        <h2 className="text-sm font-bold uppercase tracking-widest">Identificação do Voo</h2>
+                    <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-3 text-blue-400">
+                            <Plane className="w-5 h-5" />
+                            <h2 className="text-sm font-bold uppercase tracking-widest">Identificação do Voo</h2>
+                        </div>
+                        {savedId && (
+                            <button 
+                                type="button" 
+                                onClick={handlePrint}
+                                className="flex items-center gap-2 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white px-4 py-2 rounded-xl transition-all border border-white/5 text-xs font-bold uppercase tracking-widest"
+                            >
+                                <Printer className="w-4 h-4" />
+                                Imprimir
+                            </button>
+                        )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
@@ -166,7 +298,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     type="text"
                                     value={formData.flightNumber}
                                     onChange={e => updateField('flightNumber', e.target.value.toUpperCase())}
-                                    placeholder="q"
+                                    placeholder="Ex: TP1699"
                                     className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder:text-gray-600 outline-none focus:border-blue-500/50 transition-all shadow-inner"
                                 />
                                 <Globe className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-700" />
@@ -179,7 +311,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                 type="text"
                                 value={formData.operator}
                                 onChange={e => updateField('operator', e.target.value)}
-                                placeholder="q"
+                                placeholder="Ex: TAP Air Portugal"
                                 className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder:text-gray-600 outline-none focus:border-blue-500/50 transition-all shadow-inner"
                             />
                         </div>
@@ -206,7 +338,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                 type="text"
                                 value={formData.gesdocNumber}
                                 onChange={e => updateField('gesdocNumber', e.target.value)}
-                                placeholder="qw"
+                                placeholder="GESDOC N.º"
                                 className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white placeholder:text-gray-600 outline-none focus:border-blue-500/50 transition-all shadow-inner"
                             />
                         </div>
@@ -226,7 +358,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">REGISTO PF008 (CHEGADA)</label>
-                                <input type="text" value={formData.regVPArrival} onChange={e => updateField('regVPArrival', e.target.value)} placeholder="12" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-emerald-500/30" />
+                                <input type="text" value={formData.regVPArrival} onChange={e => updateField('regVPArrival', e.target.value)} placeholder="N.º Registo" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-emerald-500/30" />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">STATUS CHEGADA</label>
@@ -243,7 +375,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ORIGEM (AEROPORTO)</label>
-                                <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} placeholder="LPPT" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-emerald-500/30" />
+                                <input type="text" value={formData.origin} onChange={e => updateField('origin', e.target.value)} placeholder="Ex: LPPT" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-emerald-500/30" />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">DESTINO (LOCAL)</label>
@@ -338,7 +470,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">REGISTO PF008 (PARTIDA)</label>
-                                <input type="text" value={formData.regVPDeparture} onChange={e => updateField('regVPDeparture', e.target.value)} placeholder="N.º PF008" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-rose-500/30" />
+                                <input type="text" value={formData.regVPDeparture} onChange={e => updateField('regVPDeparture', e.target.value)} placeholder="N.º Registo" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-rose-500/30" />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">STATUS PARTIDA</label>
@@ -359,7 +491,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">DESTINO (AEROPORTO)</label>
-                                <input type="text" value={formData.destination} onChange={e => updateField('destination', e.target.value)} placeholder="Ex: LFBO" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-rose-500/30" />
+                                <input type="text" value={formData.destination} onChange={e => updateField('destination', e.target.value)} placeholder="Ex: LPPT" className="w-full bg-[#1c2636] border border-white/10 rounded-xl py-3 px-4 text-sm text-white outline-none focus:border-rose-500/30" />
                             </div>
                             <div className="space-y-1.5">
                                 <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">DATA PARTIDA</label>
@@ -400,7 +532,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                                     <p className="text-[9px] font-bold text-gray-500 mb-1">PAX CE</p>
                                     <div className="flex items-center justify-center gap-2">
                                         <button type="button" onClick={() => updateField('departureNonSchengenCount', Math.max(0, (formData.departureNonSchengenCount||0)-1))} className="text-gray-600 hover:text-white"><Minus className="w-4 h-4" /></button>
-                                        <span className="text-lg font-black text-red-500">{formData.departureNonSchengenCount || 0}</span>
+                                        <span className="text-lg font-black text-rose-500">{formData.departureNonSchengenCount || 0}</span>
                                         <button type="button" onClick={() => updateField('departureNonSchengenCount', (formData.departureNonSchengenCount||0)+1)} className="text-red-400 hover:text-red-300"><Plus className="w-4 h-4" /></button>
                                     </div>
                                 </div>
