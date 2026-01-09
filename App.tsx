@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Topbar from './components/Topbar';
@@ -18,6 +19,7 @@ import StatisticsView from './components/StatisticsView';
 import WeeklyStatisticsView from './components/WeeklyStatisticsView';
 import MonthlyStatisticsView from './components/MonthlyStatisticsView';
 import WeatherView from './components/clima/WeatherView';
+import WeatherAlertsView from './components/clima/WeatherAlertsView';
 import ContactsView from './components/ContactsView';
 import { ViewState, UserProfile, FlightFormData } from './types';
 
@@ -102,6 +104,8 @@ function App() {
                 return <AiImageEditor />;
             case 'weather':
                 return <WeatherView />;
+            case 'weather-alerts':
+                return <WeatherAlertsView />;
             case 'weather-pxo':
                 return <WeatherView airportCode="PXO" />;
             case 'weather-fnc':

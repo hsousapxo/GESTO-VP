@@ -88,6 +88,7 @@ export type ViewState =
     | 'weather'
     | 'weather-pxo'
     | 'weather-fnc'
+    | 'weather-alerts'
     | 'templates' 
     | 'legislation' 
     | 'procedures'

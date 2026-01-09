@@ -22,7 +22,7 @@ const WeeklyStatisticsView: React.FC = () => {
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             <BarChart3 className="w-7 h-7 text-blue-500" />
-                            Painel Semanal
+                            Relatório Semanal
                         </h2>
                         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Análise de tráfego dos últimos 7 dias</p>
                     </div>

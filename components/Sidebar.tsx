@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { 
     Shield, 
@@ -44,7 +45,8 @@ import {
     PlaneTakeoff,
     PlaneLanding,
     Archive,
-    BarChart3
+    BarChart3,
+    AlertTriangle
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -143,36 +145,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         active={currentView === 'procedures'}
                         onClick={() => onChangeView('procedures')}
                         isCollapsed={isCollapsed}
-                    />
-
-                    {/* Relatórios Modelos Section */}
-                    {!isCollapsed && (
-                        <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Relatórios Modelos
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem 
-                        icon={<FileText />} 
-                        label="Relatório Turno" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<LineChart />} 
-                        label="Relatório Semanal" 
-                        active={currentView === 'statistics-weekly'} 
-                        onClick={() => onChangeView('statistics-weekly')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<BarChart />} 
-                        label="Relatório Mensal" 
-                        active={currentView === 'statistics-monthly'} 
-                        onClick={() => onChangeView('statistics-monthly')} 
-                        isCollapsed={isCollapsed} 
                     />
 
                     {/* Aplicações PF008 */}
@@ -300,6 +272,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         isCollapsed={isCollapsed}
                     />
                      <MenuItem 
+                        icon={<AlertTriangle />} 
+                        label="Alerta Tempo" 
+                        active={currentView === 'weather-alerts'}
+                        onClick={() => onChangeView('weather-alerts')}
+                        isCollapsed={isCollapsed}
+                    />
+                     <MenuItem 
                         icon={<PlaneTakeoff />} 
                         label="PXO (Porto Santo)" 
                         active={currentView === 'weather-pxo'}
@@ -315,8 +294,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     />
                 </MenuSection>
 
+                {/* Relatórios Modelos - PREVIOUSLY ESTATÍSTICAS */}
                 <MenuSection 
-                    title="Estatísticas" 
+                    title="Relatórios Modelos" 
                     icon={<BarChart className="w-4 h-4 text-purple-400" />} 
                     defaultOpen={false}
                     isCollapsed={isCollapsed}
@@ -325,21 +305,21 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 >
                     <MenuItem 
                         icon={<PieChart />} 
-                        label="Painel Geral" 
+                        label="Relatório de Turno" 
                         active={currentView === 'statistics'} 
                         onClick={() => onChangeView('statistics')} 
                         isCollapsed={isCollapsed} 
                     />
                     <MenuItem 
                         icon={<BarChart3 />} 
-                        label="Painel Semanal" 
+                        label="Relatório Semanal" 
                         active={currentView === 'statistics-weekly'} 
                         onClick={() => onChangeView('statistics-weekly')} 
                         isCollapsed={isCollapsed} 
                     />
                     <MenuItem 
                         icon={<LineChart />} 
-                        label="Painel Mensal" 
+                        label="Relatório Mensal" 
                         active={currentView === 'statistics-monthly'} 
                         onClick={() => onChangeView('statistics-monthly')} 
                         isCollapsed={isCollapsed} 
