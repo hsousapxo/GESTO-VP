@@ -1,5 +1,17 @@
 import React from 'react';
-import { BarChart3, TrendingUp, TrendingDown, Users, Calendar, Download, Plane } from 'lucide-react';
+import { 
+    BarChart3, 
+    TrendingUp, 
+    TrendingDown, 
+    Users, 
+    Calendar, 
+    Download, 
+    Plane, 
+    FileText, 
+    FileDown, 
+    ArrowRight,
+    CheckCircle2
+} from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, AreaChart, Area } from 'recharts';
 
 const WeeklyStatisticsView: React.FC = () => {
@@ -14,11 +26,17 @@ const WeeklyStatisticsView: React.FC = () => {
         { name: 'Domingo', voos: 5, pax: 30 },
     ];
 
+    const handleDownloadTemplate = (name: string) => {
+        // Simulação de download
+        alert(`A iniciar download do ficheiro: ${name}`);
+    };
+
     return (
         <div className="p-6 h-full flex flex-col">
-            <div className="max-w-7xl mx-auto w-full">
+            <div className="max-w-7xl mx-auto w-full space-y-8">
+                
                 {/* Header */}
-                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <div>
                         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
                             <BarChart3 className="w-7 h-7 text-blue-500" />
@@ -28,12 +46,12 @@ const WeeklyStatisticsView: React.FC = () => {
                     </div>
                     <button className="flex items-center gap-2 bg-primary dark:bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-secondary dark:hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm">
                         <Download className="w-4 h-4" />
-                        Exportar Relatório Semanal
+                        Exportar Estatísticas Semanais
                     </button>
                 </div>
 
                 {/* KPI Cards for the Week */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                         <div className="flex justify-between items-start mb-2">
                             <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600">
@@ -86,7 +104,7 @@ const WeeklyStatisticsView: React.FC = () => {
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
                                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
                                     <Tooltip 
-                                        contentStyle={{backgroundColor: 'rgba(31, 41, 55, 0.9)', borderRadius: '8px', border: 'none', color: '#fff'}}
+                                        contentStyle={{backgroundColor: 'rgba(31, 41, 45, 0.9)', borderRadius: '8px', border: 'none', color: '#fff'}}
                                         itemStyle={{color: '#fff'}}
                                     />
                                     <Bar name="Voos" dataKey="voos" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={40} />
@@ -111,7 +129,7 @@ const WeeklyStatisticsView: React.FC = () => {
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
                                     <YAxis axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
                                     <Tooltip 
-                                        contentStyle={{backgroundColor: 'rgba(31, 41, 55, 0.9)', borderRadius: '8px', border: 'none', color: '#fff'}}
+                                        contentStyle={{backgroundColor: 'rgba(31, 41, 45, 0.9)', borderRadius: '8px', border: 'none', color: '#fff'}}
                                         itemStyle={{color: '#fff'}}
                                     />
                                     <Area type="monotone" dataKey="pax" stroke="#8b5cf6" fillOpacity={1} fill="url(#colorPax)" />
@@ -120,6 +138,70 @@ const WeeklyStatisticsView: React.FC = () => {
                         </div>
                     </div>
                 </div>
+
+                {/* MODAL / DOWNLOAD SECTION: Modelo Relatório de Turno */}
+                <div className="pt-4">
+                    <h3 className="text-sm font-black text-gray-500 dark:text-gray-400 uppercase tracking-[0.2em] mb-4">Modelos e Recursos Semanais</h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* THE REQUESTED TEMPLATE CARD */}
+                        <div className="bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-[24px] p-6 border border-blue-500/20 shadow-xl group relative overflow-hidden">
+                            {/* Abstract background shape */}
+                            <div className="absolute -right-4 -top-4 w-32 h-32 bg-blue-500/5 rounded-full blur-2xl group-hover:bg-blue-500/10 transition-all"></div>
+                            
+                            <div className="flex items-start justify-between relative z-10">
+                                <div className="flex gap-4">
+                                    <div className="w-14 h-14 bg-blue-600/20 rounded-2xl flex items-center justify-center border border-blue-500/30">
+                                        <FileText className="w-7 h-7 text-blue-400" />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white group-hover:text-blue-400 transition-colors">Modelo Relatório de Turno</h4>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[10px] font-black bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30 uppercase">PDF / XLSX</span>
+                                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">v2.4 • Jan 2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p className="text-sm text-gray-400 mt-4 leading-relaxed">
+                                Documento oficial para o registo detalhado de ocorrências, tráfego aéreo e passageiros durante o turno.
+                            </p>
+
+                            <div className="mt-6 pt-6 border-t border-white/5 flex items-center justify-between">
+                                <div className="flex items-center gap-2 text-[10px] font-bold text-green-500 uppercase">
+                                    <CheckCircle2 className="w-3 h-3" />
+                                    Atualizado
+                                </div>
+                                <button 
+                                    onClick={() => handleDownloadTemplate('Modelo_Relatorio_Turno_v2.4.pdf')}
+                                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold text-xs transition-all shadow-lg shadow-blue-900/20 active:scale-95"
+                                >
+                                    <FileDown className="w-4 h-4" />
+                                    DESCARREGAR MODELO
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Optional Second Resource Card for Balance */}
+                        <div className="bg-[#131b2e] rounded-[24px] p-6 border border-white/5 shadow-lg flex flex-col justify-between">
+                            <div>
+                                <h4 className="text-gray-300 font-bold mb-2 flex items-center gap-2">
+                                    <CheckCircle2 className="w-4 h-4 text-gray-500" />
+                                    Instruções de Preenchimento
+                                </h4>
+                                <p className="text-xs text-gray-500 leading-relaxed">
+                                    Consulte o guia rápido de preenchimento para garantir a conformidade com as normas DSAM/PF008.
+                                </p>
+                            </div>
+                            <button className="mt-6 flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 hover:text-white transition-colors py-2 border border-dashed border-gray-700 rounded-xl hover:border-gray-500">
+                                VER GUIA ONLINE
+                                <ArrowRight className="w-3 h-3" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     );

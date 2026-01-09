@@ -27,10 +27,7 @@ import {
     PieChart, 
     Users, 
     Radar,
-    AppWindow,
-    Link as LinkIcon,
     Globe,
-    Database,
     Scan,
     Siren,
     ArrowLeftRight,
@@ -46,7 +43,12 @@ import {
     PlaneLanding,
     Archive,
     BarChart3,
-    AlertTriangle
+    AlertTriangle,
+    History,
+    Activity,
+    FileSpreadsheet,
+    Layers,
+    Library
 } from 'lucide-react';
 import { ViewState } from '../types';
 
@@ -100,356 +102,129 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     </button>
                 )}
             </div>
-            
-            {/* Collapse toggle button when collapsed (centered) */}
-            {isCollapsed && (
-                <div className="hidden lg:flex justify-center py-2 border-b border-white/5">
-                    <button 
-                        onClick={() => setIsCollapsed(false)}
-                        className="text-gray-400 hover:text-white transition-colors p-2"
-                        title="Expandir menu"
-                    >
-                        <PanelLeftOpen className="w-5 h-5" />
-                    </button>
-                </div>
-            )}
 
             <div className="flex-1 overflow-y-auto py-5 custom-scrollbar h-[calc(100vh-81px)]">
                 
-                {/* GS PF008 - MOVED TO TOP */}
-                <MenuSection 
-                    title="GS PF008" 
-                    icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} 
-                    defaultOpen={true}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                     <MenuItem 
-                        icon={<Files />} 
-                        label="Modelos e Formulários" 
-                        active={currentView === 'templates'}
-                        onClick={() => onChangeView('templates')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<BookOpen />} 
-                        label="Leg PF008" 
-                        active={currentView === 'legislation'}
-                        onClick={() => onChangeView('legislation')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<FileText />} 
-                        label="Procedimentos" 
-                        active={currentView === 'procedures'}
-                        onClick={() => onChangeView('procedures')}
-                        isCollapsed={isCollapsed}
-                    />
-
-                    {/* Aplicações PF008 */}
-                    {!isCollapsed && (
-                        <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Aplicações
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem 
-                        icon={<Scan />} 
-                        label="PASSE+" 
-                        onClick={() => openExternalLink('https://passe.ssi.local/app/select-app')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Globe />} 
-                        label="PORTAL FRONTEIRAS" 
-                        onClick={() => openExternalLink('https://iam.ssi.local/realms/realm-pfront/protocol/openid-connect/auth?client_id=client-pfront-frontend&redirect_uri=https%3A%2F%2Fportalfronteiras.ssi.local%2Faplicacoes%2Faplicacoes-fronteira&state=9ce1a4e2-a37a-4782-8532-6f5c9fa7ff48&response_mode=fragment&response_type=code&scope=openid&nonce=5855955a-db20-41f7-bb2c-7203c0a0e64c&code_challenge=UH8xRJYorwCqxL9PSna5Iy8cqxayotY6XZ1QpWfhKpw&code_challenge_method=S256')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Database />} 
-                        label="PRISMA" 
-                        onClick={() => openExternalLink('https://prisma.ssi.local/PRISMA/')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Siren />} 
-                        label="SISII" 
-                        onClick={() => alert('Link SISII indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<ArrowLeftRight />} 
-                        label="EES" 
-                        onClick={() => alert('Link EES indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Stamp />} 
-                        label="VIS" 
-                        onClick={() => alert('Link VIS indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<CreditCard />} 
-                        label="FTA (ANA)" 
-                        onClick={() => openExternalLink('https://apps.ana.pt/BILL_Theme/LoginPage.aspx')}
-                        isCollapsed={isCollapsed}
-                    />
-
-                    {/* Links PF008 */}
-                    {!isCollapsed && (
-                        <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Links Úteis
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem 
-                        icon={<LinkIcon />} 
-                        label="Link Externo 1" 
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<LinkIcon />} 
-                        label="Link Externo 2" 
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Registo de Voos" 
-                    icon={<Briefcase className="w-4 h-4 text-red-500" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<Radar />} 
-                        label="Radar de Voos" 
-                        active={currentView === 'flight-tracker'}
-                        onClick={() => onChangeView('flight-tracker')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<PlusCircle />} 
-                        label="Novo Voo" 
-                        active={currentView === 'flight-form'}
-                        onClick={() => onChangeView('flight-form')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<List />} 
-                        label="Voos Agendados" 
-                        active={currentView === 'flight-list'}
-                        onClick={() => onChangeView('flight-list')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Archive />} 
-                        label="Arquivo Voos" 
-                        active={currentView === 'flight-archive'}
-                        onClick={() => onChangeView('flight-archive')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Meteorologia" 
-                    icon={<CloudSun className="w-4 h-4 text-blue-300" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<CloudSun />} 
-                        label="Resumo" 
-                        active={currentView === 'weather'}
-                        onClick={() => onChangeView('weather')}
-                        isCollapsed={isCollapsed}
-                    />
-                     <MenuItem 
-                        icon={<AlertTriangle />} 
-                        label="Alerta Tempo" 
-                        active={currentView === 'weather-alerts'}
-                        onClick={() => onChangeView('weather-alerts')}
-                        isCollapsed={isCollapsed}
-                    />
-                     <MenuItem 
-                        icon={<PlaneTakeoff />} 
-                        label="PXO (Porto Santo)" 
-                        active={currentView === 'weather-pxo'}
-                        onClick={() => onChangeView('weather-pxo')}
-                        isCollapsed={isCollapsed}
-                    />
-                     <MenuItem 
-                        icon={<PlaneLanding />} 
-                        label="FNC (Madeira)" 
-                        active={currentView === 'weather-fnc'}
-                        onClick={() => onChangeView('weather-fnc')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                {/* Relatórios Modelos - PREVIOUSLY ESTATÍSTICAS */}
-                <MenuSection 
-                    title="Relatórios Modelos" 
-                    icon={<BarChart className="w-4 h-4 text-purple-400" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<PieChart />} 
-                        label="Relatório de Turno" 
-                        active={currentView === 'statistics'} 
-                        onClick={() => onChangeView('statistics')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<BarChart3 />} 
-                        label="Relatório Semanal" 
-                        active={currentView === 'statistics-weekly'} 
-                        onClick={() => onChangeView('statistics-weekly')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem 
-                        icon={<LineChart />} 
-                        label="Relatório Mensal" 
-                        active={currentView === 'statistics-monthly'} 
-                        onClick={() => onChangeView('statistics-monthly')} 
-                        isCollapsed={isCollapsed} 
-                    />
-                </MenuSection>
-
-                {/* PF008 Ask! Section */}
-                <MenuSection 
-                    title="PF008 Ask!" 
-                    icon={<Cpu className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<Bot />} 
-                        label="Chat" 
-                        active={currentView === 'ai-assistant'} 
-                        onClick={() => onChangeView('ai-assistant')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Camera />} 
-                        label="Captura / Upload Imagem" 
-                        active={currentView === 'ai-image-editor'}
-                        onClick={() => onChangeView('ai-image-editor')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Calendário" 
-                    icon={<Calendar className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<CalendarDays />} 
-                        label="Vista Mensal" 
-                        active={currentView === 'calendar-monthly'}
-                        onClick={() => onChangeView('calendar-monthly')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<CalendarRange />} 
-                        label="Vista Anual" 
-                        active={currentView === 'calendar-annual'}
-                        onClick={() => onChangeView('calendar-annual')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<BellRing />} 
-                        label="Lembretes" 
-                        active={currentView === 'reminders'}
-                        onClick={() => onChangeView('reminders')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Contactos PFO08" 
-                    icon={<Users className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    <MenuItem 
-                        icon={<Phone />} 
-                        label="Lista Telefónica" 
-                        active={currentView === 'contacts'}
-                        onClick={() => onChangeView('contacts')}
-                        isCollapsed={isCollapsed} 
-                    />
-                    <MenuItem icon={<Bell />} label="Piquetes / Urgências" isCollapsed={isCollapsed} />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Formação PF008" 
-                    icon={<GraduationCap className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                    titleClassName="text-white font-bold"
-                >
-                    {!isCollapsed && (
-                        <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
-                                Plataformas de Formação e Ambiente de Testes
-                            </span>
-                        </div>
-                    )}
-                    <MenuItem 
-                        icon={<MonitorPlay />} 
-                        label="Plataforma E-Learning" 
-                        onClick={() => openExternalLink('https://elearning.ssi.local')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<FlaskConical />} 
-                        label="Ambiente Teste PASSE" 
-                        onClick={() => alert('Ambiente Sandbox PASSE')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<FlaskConical />} 
-                        label="Ambiente Teste Portal" 
-                        onClick={() => alert('Ambiente Sandbox Portal')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <div className="border-t border-white/10 mt-auto">
-                   <div className="p-4">
+                {/* GS PF008 Section */}
+                <MenuSection title="GS PF008" icon={<FolderOpen className="w-4 h-4 text-yellow-500" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <MenuItem icon={<Files />} label="Modelos e Formulários" active={currentView === 'templates'} onClick={() => onChangeView('templates')} isCollapsed={isCollapsed} />
+                    
+                    {/* Folder: Leg PF008 */}
+                    <SubMenu label="Leg PF008" icon={<BookOpen className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
                         <MenuItem 
-                            icon={<LogOut />} 
-                            label="Sair" 
-                            className="text-red-300 hover:bg-red-900/20 hover:text-red-200"
-                            onClick={onLogout}
+                            icon={<Library className="w-3.5 h-3.5" />} 
+                            label="Livraria Jurídica" 
+                            active={currentView === 'legal-library'} 
+                            onClick={() => onChangeView('legal-library')} 
                             isCollapsed={isCollapsed}
+                            isSmall
                         />
-                   </div>
+                        <MenuItem 
+                            icon={<FileText className="w-3.5 h-3.5" />} 
+                            label="Diplomas Legais" 
+                            active={currentView === 'legislation'} 
+                            onClick={() => onChangeView('legislation')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+
+                    <MenuItem icon={<ClipboardList />} label="Procedimentos" active={currentView === 'procedures'} onClick={() => onChangeView('procedures')} isCollapsed={isCollapsed} />
+                </MenuSection>
+
+                {/* Registo de Voos */}
+                <MenuSection title="Registo de Voos" icon={<Briefcase className="w-4 h-4 text-red-500" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <MenuItem icon={<Radar />} label="Radar de Voos" active={currentView === 'flight-tracker'} onClick={() => onChangeView('flight-tracker')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<PlusCircle />} label="Novo Voo" active={currentView === 'flight-form'} onClick={() => onChangeView('flight-form')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<List />} label="Voos Agendados" active={currentView === 'flight-list'} onClick={() => onChangeView('flight-list')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<Archive />} label="Arquivo Voos" active={currentView === 'flight-archive'} onClick={() => onChangeView('flight-archive')} isCollapsed={isCollapsed} />
+                </MenuSection>
+
+                {/* Relatórios Section - ORGANIZED AS PER REQUEST */}
+                <MenuSection title="Relatórios" icon={<FileText className="w-4 h-4 text-white" />} defaultOpen={true} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    
+                    {/* Folder: Relatório Turno */}
+                    <SubMenu label="Relatório Turno" icon={<History className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<List className="w-3.5 h-3.5" />} 
+                            label="Modelo Relatório de Turno" 
+                            active={currentView === 'statistics'} 
+                            onClick={() => onChangeView('statistics')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+
+                    {/* Folder: Relatório Semanal */}
+                    <SubMenu label="Relatório Semanal" icon={<Calendar className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<Activity className="w-3.5 h-3.5" />} 
+                            label="Pulsar" 
+                            active={currentView === 'report-pulsar'} 
+                            onClick={() => onChangeView('report-pulsar')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<Globe className="w-3.5 h-3.5" />} 
+                            label="Eurosur" 
+                            active={currentView === 'report-eurosur'} 
+                            onClick={() => onChangeView('report-eurosur')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<BarChart3 className="w-3.5 h-3.5" />} 
+                            label="Estatística Semanal" 
+                            active={currentView === 'statistics-weekly'} 
+                            onClick={() => onChangeView('statistics-weekly')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+
+                    {/* Folder: Relatório Mensal */}
+                    <SubMenu label="Relatório Mensal" icon={<CalendarRange className="w-4 h-4 text-blue-400" />} isCollapsed={isCollapsed}>
+                        <MenuItem 
+                            icon={<FileSpreadsheet className="w-3.5 h-3.5" />} 
+                            label="RAMFA" 
+                            active={currentView === 'report-ramfa'} 
+                            onClick={() => onChangeView('report-ramfa')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                        <MenuItem 
+                            icon={<LineChart className="w-3.5 h-3.5" />} 
+                            label="Estatística Mensal" 
+                            active={currentView === 'statistics-monthly'} 
+                            onClick={() => onChangeView('statistics-monthly')} 
+                            isCollapsed={isCollapsed}
+                            isSmall
+                        />
+                    </SubMenu>
+                </MenuSection>
+
+                {/* Meteorologia */}
+                <MenuSection title="Meteorologia" icon={<CloudSun className="w-4 h-4 text-blue-300" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <MenuItem icon={<CloudSun />} label="Resumo" active={currentView === 'weather'} onClick={() => onChangeView('weather')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<AlertTriangle />} label="Alerta Tempo" active={currentView === 'weather-alerts'} onClick={() => onChangeView('weather-alerts')} isCollapsed={isCollapsed} />
+                </MenuSection>
+
+                {/* Calendário */}
+                <MenuSection title="Calendário" icon={<Calendar className="w-4 h-4" />} isCollapsed={isCollapsed} onExpand={handleExpand}>
+                    <MenuItem icon={<CalendarDays />} label="Vista Mensal" active={currentView === 'calendar-monthly'} onClick={() => onChangeView('calendar-monthly')} isCollapsed={isCollapsed} />
+                    <MenuItem icon={<BellRing />} label="Lembretes" active={currentView === 'reminders'} onClick={() => onChangeView('reminders')} isCollapsed={isCollapsed} />
+                </MenuSection>
+
+                <div className="border-t border-white/10 mt-auto p-4">
+                    <MenuItem icon={<LogOut />} label="Sair" className="text-red-300 hover:bg-red-900/20" onClick={onLogout} isCollapsed={isCollapsed} />
                 </div>
             </div>
         </div>
     );
 };
+
+// --- Helper Components ---
 
 interface MenuSectionProps { 
     title: string; 
@@ -458,46 +233,53 @@ interface MenuSectionProps {
     defaultOpen?: boolean;
     isCollapsed?: boolean;
     onExpand?: () => void;
-    titleClassName?: string;
 }
 
-const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaultOpen = true, isCollapsed, onExpand, titleClassName }) => {
+const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaultOpen = false, isCollapsed, onExpand }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
-
-    const handleHeaderClick = () => {
-        if (isCollapsed && onExpand) {
-            onExpand();
-            setIsOpen(true);
-        } else {
-            setIsOpen(!isOpen);
-        }
-    };
+    const handleHeaderClick = () => { if (isCollapsed && onExpand) { onExpand(); setIsOpen(true); } else { setIsOpen(!isOpen); } };
 
     return (
-        <div className="mb-2">
+        <div className="mb-1">
+            <button onClick={handleHeaderClick} className={`w-full flex items-center px-4 py-2.5 text-white hover:bg-white/5 transition-colors select-none ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
+                <div className="flex items-center gap-3">
+                    <span className="text-gray-400">{icon}</span>
+                    {!isCollapsed && <span className="text-[11px] uppercase font-black tracking-widest">{title}</span>}
+                </div>
+                {!isCollapsed && (isOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />)}
+            </button>
+            <div className={`overflow-hidden transition-all duration-300 ${isOpen && !isCollapsed ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="pb-1">{children}</div>
+            </div>
+        </div>
+    );
+};
+
+interface SubMenuProps {
+    label: string;
+    icon: React.ReactNode;
+    children: React.ReactNode;
+    isCollapsed?: boolean;
+}
+
+const SubMenu: React.FC<SubMenuProps> = ({ label, icon, children, isCollapsed }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    if (isCollapsed) return null;
+
+    return (
+        <div className="pl-4">
             <button 
-                onClick={handleHeaderClick}
-                className={`w-full flex items-center px-4 py-3 text-white font-bold hover:text-gray-200 hover:bg-white/10 transition-colors group select-none ${isCollapsed ? 'justify-center' : 'justify-between'}`}
-                title={isCollapsed ? title : ''}
+                onClick={() => setIsOpen(!isOpen)}
+                className="w-full flex items-center justify-between px-4 py-2 text-sm font-bold text-gray-100 hover:text-white transition-colors group"
             >
                 <div className="flex items-center gap-3">
-                    <span className={`transition-colors ${isOpen && !isCollapsed ? 'text-blue-400' : 'text-gray-400 group-hover:text-white'}`}>
-                        {icon}
-                    </span>
-                    {!isCollapsed && (
-                        <span className={`text-xs uppercase font-bold tracking-wider ${titleClassName || (isOpen ? 'text-white' : '')}`}>
-                            {title}
-                        </span>
-                    )}
+                    <span className="text-blue-400 group-hover:scale-110 transition-transform">{icon}</span>
+                    <span className="truncate">{label}</span>
                 </div>
-                {!isCollapsed && (
-                    isOpen ? <ChevronDown className="w-4 h-4 text-white" /> : <ChevronRight className="w-4 h-4 text-white" />
-                )}
+                {isOpen ? <ChevronDown className="w-3.5 h-3.5 opacity-50" /> : <ChevronRight className="w-3.5 h-3.5 opacity-50" />}
             </button>
-            <div 
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen && !isCollapsed ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-                <div className="pb-2">
+            <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="pl-6 border-l border-white/5 ml-6 py-1 flex flex-col gap-0.5">
                     {children}
                 </div>
             </div>
@@ -512,18 +294,18 @@ const MenuItem: React.FC<{
     className?: string;
     onClick?: () => void;
     isCollapsed?: boolean;
-}> = ({ icon, label, active, className = '', onClick, isCollapsed }) => (
+    isSmall?: boolean;
+}> = ({ icon, label, active, className = '', onClick, isCollapsed, isSmall }) => (
     <button 
         onClick={onClick}
-        className={`w-full flex items-center px-4 py-3 cursor-pointer transition-colors text-sm font-bold text-white
-        ${active ? 'bg-secondary dark:bg-blue-900 border-l-4 border-blue-400' : 'hover:bg-white/10 border-l-4 border-transparent hover:opacity-100'} 
-        ${className}
-        ${isCollapsed ? 'justify-center border-l-0 px-2' : ''}
-        `}
+        className={`w-full flex items-center cursor-pointer transition-all border-l-4
+        ${active ? 'bg-secondary/40 text-blue-400 border-blue-400' : 'text-gray-400 hover:text-white border-transparent hover:bg-white/5'} 
+        ${isCollapsed ? 'justify-center border-l-0 py-3' : isSmall ? 'py-1.5 px-3 text-xs font-medium' : 'py-2.5 px-4 text-sm font-bold'}
+        ${className}`}
         title={isCollapsed ? label : ''}
     >
-        <span className={`w-6 h-6 flex items-center justify-center ${!isCollapsed ? 'mr-3' : ''}`}>{icon}</span>
-        {!isCollapsed && <span>{label}</span>}
+        <span className={`${isCollapsed ? '' : isSmall ? 'mr-2' : 'mr-3'} opacity-70`}>{icon}</span>
+        {!isCollapsed && <span className="truncate">{label}</span>}
     </button>
 );
 

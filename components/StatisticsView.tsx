@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart3, TrendingUp, Users, Calendar, Download, PieChart, LineChart } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Line, ComposedChart } from 'recharts';
@@ -81,10 +82,10 @@ const StatisticsView: React.FC = () => {
                 {/* Charts Area */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Weekly Traffic */}
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors min-h-[350px]">
                         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Tráfego Semanal (Entradas vs Saídas)</h3>
-                        <div className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="w-full h-full">
+                            <ResponsiveContainer width="100%" height="100%" minHeight={250} aspect={1.5}>
                                 <BarChart data={paxData}>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#374151" strokeOpacity={0.1} />
                                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
@@ -102,10 +103,10 @@ const StatisticsView: React.FC = () => {
                     </div>
 
                     {/* Top Nationalities */}
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 transition-colors min-h-[350px]">
                         <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Top 5 Nacionalidades (Non-Schengen)</h3>
-                        <div className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
+                        <div className="w-full h-full">
+                            <ResponsiveContainer width="100%" height="100%" minHeight={250} aspect={1.5}>
                                 <ComposedChart layout="vertical" data={nationalityData}>
                                     <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#374151" strokeOpacity={0.1} />
                                     <XAxis type="number" axisLine={false} tickLine={false} tick={{fill: '#9ca3af', fontSize: 12}} />
