@@ -56,13 +56,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onChangeView }) => {
             {/* Footer: Monthly Summary (Cloned Design) */}
             <MonthlySummaryFooter flights={flights} />
 
-            {/* Floating Action Button */}
-            <button 
-                onClick={() => onChangeView?.('flight-form')}
-                className="fixed bottom-8 right-8 w-14 h-14 bg-blue-500 hover:bg-blue-600 rounded-full shadow-lg shadow-blue-500/40 text-white flex items-center justify-center transition-transform hover:scale-110 z-50"
-            >
-                <Plus className="w-8 h-8" />
-            </button>
+            {/* O botão flutuante (+) foi removido daqui */}
         </div>
     );
 };
@@ -294,7 +288,7 @@ const WeekCalendarWidget: React.FC = () => {
 const NextEventsWidget: React.FC<{ flights: FlightFormData[] }> = ({ flights }) => {
     const [activeTab, setActiveTab] = useState<'Todos' | 'Voos' | 'Alertas'>('Todos');
 
-    // Mock Data to match the image exactly
+    // Mock Data to match the image exatamente
     const events = [
         {
             id: 1,
@@ -340,9 +334,7 @@ const NextEventsWidget: React.FC<{ flights: FlightFormData[] }> = ({ flights }) 
         <div className="bg-[#131b2e] rounded-[32px] p-6 border border-white/5 flex flex-col flex-1 min-h-[400px]">
             <div className="flex justify-between items-center mb-6">
                 <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">PRÓXIMOS EVENTOS</span>
-                <button className="bg-blue-600 hover:bg-blue-700 text-white p-1.5 rounded-lg transition-colors">
-                    <Plus className="w-5 h-5" />
-                </button>
+                {/* O botão (+) foi removido daqui */}
             </div>
 
             {/* Tabs */}

@@ -410,7 +410,13 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                     onExpand={handleExpand}
                     titleClassName="text-white font-bold"
                 >
-                    <MenuItem icon={<Phone />} label="Lista Telefónica" isCollapsed={isCollapsed} />
+                    <MenuItem 
+                        icon={<Phone />} 
+                        label="Lista Telefónica" 
+                        active={currentView === 'contacts'}
+                        onClick={() => onChangeView('contacts')}
+                        isCollapsed={isCollapsed} 
+                    />
                     <MenuItem icon={<Bell />} label="Piquetes / Urgências" isCollapsed={isCollapsed} />
                 </MenuSection>
 

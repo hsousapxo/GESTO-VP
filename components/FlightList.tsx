@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plane, Calendar, Users, Trash2, ArrowRight, ArrowLeftRight, CheckCircle, Clock, XCircle, Info, Printer, Eye, Edit, PlaneLanding, PlaneTakeoff, Hash, Archive, Globe, Ban } from 'lucide-react';
+import { Plane, Calendar, Users, Trash2, ArrowRight, ArrowLeftRight, CheckCircle, Clock, XCircle, Info, Printer, Eye, Edit, PlaneLanding, PlaneTakeoff, Hash, Archive, Globe, Ban, MapPin, Tag, UserCheck, File } from 'lucide-react';
 import { getFlights, deleteFlight, saveFlight } from '../services/db';
 import { FlightFormData, FlightType } from '../types';
 
@@ -31,6 +31,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
     const handleDelete = async (id: string) => {
         if (window.confirm("Tem certeza que deseja apagar este registo permanentemente?")) {
             await deleteFlight(id);
+            if (viewFlight && viewFlight.id === id) setViewFlight(null); // Close modal if open
             loadData();
         }
     };
@@ -40,6 +41,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
             try {
                 // Update status to 'Arquivado'
                 await saveFlight({ ...flight, status: 'Arquivado' });
+                if (viewFlight && viewFlight.id === flight.id) setViewFlight(null); // Close modal
                 loadData(); // Refresh list
             } catch (error) {
                 console.error("Error archiving flight", error);
@@ -182,57 +184,180 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "Voos Agendados
         return <div className="p-6 text-center text-gray-500">Carregando registos...</div>;
     }
 
+    const isArrival = viewFlight?.flightType === FlightType.ARRIVAL;
+    const isDeparture = viewFlight?.flightType === FlightType.DEPARTURE;
+    const isTurnaround = viewFlight?.flightType === FlightType.TURNAROUND;
+
     return (
         <div className="p-6 relative">
             {/* VIEW MODAL (Detail View) */}
             {viewFlight && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-gray-100 dark:border-gray-700">
-                        <div className="bg-primary dark:bg-blue-900 p-4 flex justify-between items-center text-white">
-                            <h3 className="font-bold text-lg">Detalhes do Voo {viewFlight.flightNumber}</h3>
-                            <button onClick={() => setViewFlight(null)} className="hover:bg-white/20 p-1 rounded transition-colors"><XCircle className="w-5 h-5" /></button>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Natureza</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold">{viewFlight.flightNature}</span>
-                                </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Status</span>
-                                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-bold ${getStatusClass(viewFlight.status)}`}>
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+                    <div className="bg-[#1e293b] rounded-2xl shadow-2xl w-full max-w-md p-6 border border-gray-700 relative">
+                        
+                        {/* Close Button */}
+                        <button 
+                            onClick={() => setViewFlight(null)}
+                            className="absolute top-3 right-3 text-gray-400 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors z-20"
+                            title="Fechar Janela"
+                        >
+                            <XCircle className="w-5 h-5" />
+                        </button>
+                        
+                        <div className="flex gap-5">
+                            {/* Blue Icon */}
+                            <div className="w-14 h-14 bg-blue-600/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <File className="w-7 h-7 text-blue-500" />
+                            </div>
+
+                            {/* Content */}
+                            <div className="flex-1 min-w-0 space-y-2">
+                                {/* Header: Number + Status */}
+                                <div className="flex justify-between items-start">
+                                    <h2 className="text-2xl font-bold text-white leading-tight truncate">
+                                        {viewFlight.flightNumber}
+                                    </h2>
+                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                                        viewFlight.status === 'Confirmado' ? 'bg-blue-500/20 text-blue-400' :
+                                        viewFlight.status === 'Realizado' ? 'bg-green-500/20 text-green-400' :
+                                        viewFlight.status === 'Cancelado' ? 'bg-red-500/20 text-red-400' :
+                                        viewFlight.status === 'Arquivado' ? 'bg-purple-500/20 text-purple-400' :
+                                        'bg-yellow-500/20 text-yellow-400'
+                                    }`}>
                                         {viewFlight.status}
                                     </span>
                                 </div>
-                                <div className="col-span-2 bg-gray-50 dark:bg-gray-700/50 p-3 rounded-lg border border-gray-100 dark:border-gray-700">
-                                    <span className="block text-gray-400 text-xs uppercase font-bold mb-2">Rota</span>
-                                    {getRouteDisplay(viewFlight)}
+
+                                {/* Timings */}
+                                <div className="text-gray-300 text-sm space-y-1">
+                                    {(isArrival || isTurnaround) && (
+                                        <div className="flex items-center gap-2">
+                                            <PlaneLanding className="w-3.5 h-3.5 text-blue-400" /> 
+                                            <span className="truncate"><span className="font-bold text-gray-400">Che:</span> {viewFlight.scheduleTimeArrival || '--:--'} <span className="text-xs text-gray-500">({viewFlight.dateArrival ? new Date(viewFlight.dateArrival).toLocaleDateString('pt-PT') : '--/--'})</span></span>
+                                        </div>
+                                    )}
+                                    {(isDeparture || isTurnaround) && (
+                                        <div className="flex items-center gap-2">
+                                            <PlaneTakeoff className="w-3.5 h-3.5 text-orange-400" /> 
+                                            <span className="truncate"><span className="font-bold text-gray-400">Par:</span> {viewFlight.scheduleTimeDeparture || '--:--'} <span className="text-xs text-gray-500">({viewFlight.dateDeparture ? new Date(viewFlight.dateDeparture).toLocaleDateString('pt-PT') : '--/--'})</span></span>
+                                        </div>
+                                    )}
                                 </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Gesdoc</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold">{viewFlight.gesdocNumber || '--'}/{viewFlight.gesdocYear}</span>
+
+                                {/* Route */}
+                                <div className="flex items-center gap-2 text-sm text-gray-400 font-medium mt-1">
+                                    <MapPin className="w-3.5 h-3.5 text-gray-500" />
+                                    <span>
+                                        {isTurnaround ? (
+                                            <span className="flex items-center gap-1">
+                                                {viewFlight.origin} <ArrowRight className="w-3 h-3" /> LPPS <ArrowRight className="w-3 h-3" /> {viewFlight.destination}
+                                            </span>
+                                        ) : isArrival ? (
+                                            `${viewFlight.origin} → LPPS`
+                                        ) : (
+                                            `LPPS → ${viewFlight.destination}`
+                                        )}
+                                    </span>
                                 </div>
-                                <div>
-                                    <span className="block text-gray-400 text-xs uppercase font-bold">Total POB</span>
-                                    <span className="block text-gray-800 dark:text-gray-200 font-bold text-lg">{getPaxSummary(viewFlight).total}</span>
+
+                                {/* Internal Numbers & Gesdoc */}
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    {viewFlight.gesdocNumber && (
+                                        <div className="bg-white/10 px-2 py-1 rounded text-[10px] text-gray-300 border border-white/10 flex items-center gap-1" title="Número Gesdoc">
+                                            <Hash className="w-3 h-3 text-white" />
+                                            <span className="font-bold text-white">GESDOC:</span> {viewFlight.gesdocNumber}/{viewFlight.gesdocYear}
+                                        </div>
+                                    )}
+
+                                    {(isArrival || isTurnaround) && viewFlight.regVPArrival && (
+                                        <div className="bg-blue-900/40 px-2 py-1 rounded text-[10px] text-blue-200 border border-blue-800/50 flex items-center gap-1" title="Registo VP Chegada">
+                                            <Tag className="w-3 h-3" />
+                                            <span className="font-bold">VP Che:</span> {viewFlight.regVPArrival}
+                                        </div>
+                                    )}
+
+                                    {(isDeparture || isTurnaround) && viewFlight.regVPDeparture && (
+                                        <div className="bg-orange-900/40 px-2 py-1 rounded text-[10px] text-orange-200 border border-orange-800/50 flex items-center gap-1" title="Registo VP Partida">
+                                            <Tag className="w-3 h-3" />
+                                            <span className="font-bold">VP Par:</span> {viewFlight.regVPDeparture}
+                                        </div>
+                                    )}
                                 </div>
+                                
+                                {/* Pax/Crew */}
+                                <div className="flex items-center gap-4 text-sm text-gray-400 pt-1">
+                                    <div className="flex items-center gap-1.5 bg-gray-800/50 px-2 py-1 rounded">
+                                        <Users className="w-3.5 h-3.5" />
+                                        <span>Pax: <span className="text-white font-bold">{getPaxSummary(viewFlight).total}</span></span>
+                                    </div>
+                                    <div className="flex items-center gap-1.5 bg-gray-800/50 px-2 py-1 rounded">
+                                        <span className="font-bold text-[10px] border border-gray-600 px-1 rounded-sm">CRW</span>
+                                        <span>Trip: <span className="text-white font-bold">{getPaxSummary(viewFlight).crew}</span></span>
+                                    </div>
+                                </div>
+
+                                {/* Observations */}
                                 {viewFlight.observations && (
-                                    <div className="col-span-2">
-                                        <span className="block text-gray-400 text-xs uppercase font-bold">Observações</span>
-                                        <p className="text-gray-600 dark:text-gray-300 text-xs bg-yellow-50 dark:bg-yellow-900/10 p-2 rounded border border-yellow-100 dark:border-yellow-800/30">
-                                            {viewFlight.observations}
-                                        </p>
+                                    <div className="mt-2 bg-gray-800/30 p-2 rounded border-l-2 border-yellow-500/50">
+                                        <p className="text-xs text-gray-400 line-clamp-2 italic">"{viewFlight.observations}"</p>
                                     </div>
                                 )}
+
+                                <div className="flex justify-between items-start mt-3 pt-3 border-t border-gray-700/50">
+                                    <div className="text-xs">
+                                        <span className="text-gray-400 font-bold block mb-0.5">Comp. Aérea / Operadora:</span>
+                                        <span className="text-gray-300 font-medium">{viewFlight.operator || '---'}</span>
+                                    </div>
+                                    <div className="text-xs text-right">
+                                        <span className="text-gray-400 font-bold block mb-0.5">Agente:</span>
+                                        <div className="text-gray-300 font-medium flex flex-col items-end">
+                                            <span className="flex items-center gap-1">
+                                                {viewFlight.createdBy || '---'}
+                                                <UserCheck className="w-3 h-3 text-blue-400" />
+                                            </span>
+                                            {viewFlight.createdByCategory && (
+                                                <span className="text-[9px] text-gray-500">{viewFlight.createdByCategory}</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="mt-4 flex justify-end gap-2">
-                                <button onClick={() => window.print()} className="bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 px-4 py-2 rounded-lg font-medium text-sm flex items-center gap-2">
-                                    <Printer className="w-4 h-4" /> Imprimir
-                                </button>
-                                <button onClick={() => setViewFlight(null)} className="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-lg font-medium text-sm">
-                                    Fechar
-                                </button>
-                            </div>
+                        </div>
+
+                        {/* Action Icons Grid */}
+                        <div className="grid grid-cols-4 gap-4 mt-8 border-t border-gray-700/30 pt-4">
+                            <button 
+                                onClick={() => window.print()} 
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2 rounded hover:bg-white/5 group"
+                                title="Imprimir Ficha"
+                            >
+                                <Printer className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px]">Imprimir</span>
+                            </button>
+                            <button 
+                                onClick={() => { setViewFlight(null); if(onEdit) onEdit(viewFlight); }} 
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors p-2 rounded hover:bg-white/5 group"
+                                title="Editar Registo"
+                            >
+                                <Edit className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px]">Editar</span>
+                            </button>
+                            <button 
+                                onClick={() => handleArchive(viewFlight)} 
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-purple-400 transition-colors p-2 rounded hover:bg-white/5 group"
+                                title="Arquivar"
+                            >
+                                <Archive className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px]">Arquivar</span>
+                            </button>
+                            <button 
+                                onClick={() => handleDelete(viewFlight.id!)}
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-white/5 group"
+                                title="Apagar Registo"
+                            >
+                                <Trash2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px]">Eliminar</span>
+                            </button>
                         </div>
                     </div>
                 </div>

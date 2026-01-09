@@ -93,7 +93,8 @@ export type ViewState =
     | 'procedures'
     | 'calendar-monthly'
     | 'calendar-annual'
-    | 'reminders';
+    | 'reminders'
+    | 'contacts';
 
 export interface ChatMessage {
     id: string;

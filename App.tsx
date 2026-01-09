@@ -18,6 +18,7 @@ import StatisticsView from './components/StatisticsView';
 import WeeklyStatisticsView from './components/WeeklyStatisticsView';
 import MonthlyStatisticsView from './components/MonthlyStatisticsView';
 import WeatherView from './components/clima/WeatherView';
+import ContactsView from './components/ContactsView';
 import { ViewState, UserProfile, FlightFormData } from './types';
 
 function App() {
@@ -117,6 +118,8 @@ function App() {
                 return <CalendarAnnualView />;
             case 'reminders':
                 return <RemindersView />;
+            case 'contacts':
+                return <ContactsView onChangeView={setCurrentView} />;
             default:
                 return <Dashboard onChangeView={setCurrentView} />;
         }

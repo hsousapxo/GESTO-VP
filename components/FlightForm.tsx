@@ -522,38 +522,38 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                             </div>
                         </div>
 
-                        {/* Action Icons */}
-                        <div className="flex justify-end gap-6 mt-8 border-t border-gray-700/30 pt-4">
+                        {/* Action Icons - Grid Layout */}
+                        <div className="grid grid-cols-4 gap-4 mt-8 border-t border-gray-700/30 pt-4">
                             <button 
                                 onClick={() => window.print()} 
-                                className="text-gray-400 hover:text-white transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-white transition-colors p-2 rounded hover:bg-white/5 group"
                                 title="Imprimir Ficha"
                             >
-                                <Printer className="w-5 h-5" />
+                                <Printer className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 <span className="text-[10px]">Imprimir</span>
                             </button>
                             <button 
                                 onClick={handleContinueEditing} 
-                                className="text-gray-400 hover:text-blue-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-blue-400 transition-colors p-2 rounded hover:bg-white/5 group"
                                 title="Continuar a Editar"
                             >
-                                <Edit className="w-5 h-5" />
+                                <Edit className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 <span className="text-[10px]">Editar</span>
                             </button>
                             <button 
                                 onClick={handleArchive} 
-                                className="text-gray-400 hover:text-green-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-green-400 transition-colors p-2 rounded hover:bg-white/5 group"
                                 title="Arquivar e Novo"
                             >
-                                <Archive className="w-5 h-5" />
+                                <Archive className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 <span className="text-[10px]">Arquivar</span>
                             </button>
                             <button 
                                 onClick={handleDeleteAction}
-                                className="text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-white/5 flex flex-col items-center gap-1"
+                                className="flex flex-col items-center gap-1 text-gray-400 hover:text-red-400 transition-colors p-2 rounded hover:bg-white/5 group"
                                 title="Apagar Registo"
                             >
-                                <Trash2 className="w-5 h-5" />
+                                <Trash2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
                                 <span className="text-[10px]">Eliminar</span>
                             </button>
                         </div>
@@ -625,7 +625,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, currentUs
                 </div>
 
                 <form onSubmit={handleSubmit}>
-                    
+                    {/* ... Form fields remain unchanged ... */}
                     {/* General Info Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
                         {renderInput("N.º Voo", "flightNumber", "text", "TP1699", false, true)}
