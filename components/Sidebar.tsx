@@ -229,76 +229,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 </MenuSection>
 
                 <MenuSection 
-                    title="App PF008" 
-                    icon={<AppWindow className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                >
-                    <MenuItem 
-                        icon={<Scan />} 
-                        label="PASSE+" 
-                        onClick={() => openExternalLink('https://passe.ssi.local/app/select-app')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Globe />} 
-                        label="PORTAL FRONTEIRAS" 
-                        onClick={() => openExternalLink('https://iam.ssi.local/realms/realm-pfront/protocol/openid-connect/auth?client_id=client-pfront-frontend&redirect_uri=https%3A%2F%2Fportalfronteiras.ssi.local%2Faplicacoes%2Faplicacoes-fronteira&state=9ce1a4e2-a37a-4782-8532-6f5c9fa7ff48&response_mode=fragment&response_type=code&scope=openid&nonce=5855955a-db20-41f7-bb2c-7203c0a0e64c&code_challenge=UH8xRJYorwCqxL9PSna5Iy8cqxayotY6XZ1QpWfhKpw&code_challenge_method=S256')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Database />} 
-                        label="PRISMA" 
-                        onClick={() => openExternalLink('https://prisma.ssi.local/PRISMA/')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Siren />} 
-                        label="SISII" 
-                        onClick={() => alert('Link SISII indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<ArrowLeftRight />} 
-                        label="EES" 
-                        onClick={() => alert('Link EES indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<Stamp />} 
-                        label="VIS" 
-                        onClick={() => alert('Link VIS indisponível (Rede Interna)')}
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<CreditCard />} 
-                        label="FTA (ANA)" 
-                        onClick={() => openExternalLink('https://apps.ana.pt/BILL_Theme/LoginPage.aspx')}
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
-                    title="Links PF008" 
-                    icon={<LinkIcon className="w-4 h-4" />} 
-                    defaultOpen={false}
-                    isCollapsed={isCollapsed}
-                    onExpand={handleExpand}
-                >
-                    <MenuItem 
-                        icon={<LinkIcon />} 
-                        label="Link Externo 1" 
-                        isCollapsed={isCollapsed}
-                    />
-                    <MenuItem 
-                        icon={<LinkIcon />} 
-                        label="Link Externo 2" 
-                        isCollapsed={isCollapsed}
-                    />
-                </MenuSection>
-
-                <MenuSection 
                     title="Calendário" 
                     icon={<Calendar className="w-4 h-4" />} 
                     defaultOpen={false}
@@ -357,6 +287,76 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                         onClick={() => onChangeView('procedures')}
                         isCollapsed={isCollapsed}
                     />
+
+                    {/* Aplicações PF008 merged here */}
+                    {!isCollapsed && (
+                        <div className="px-4 pt-3 pb-1">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                                Aplicações
+                            </span>
+                        </div>
+                    )}
+                    <MenuItem 
+                        icon={<Scan />} 
+                        label="PASSE+" 
+                        onClick={() => openExternalLink('https://passe.ssi.local/app/select-app')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Globe />} 
+                        label="PORTAL FRONTEIRAS" 
+                        onClick={() => openExternalLink('https://iam.ssi.local/realms/realm-pfront/protocol/openid-connect/auth?client_id=client-pfront-frontend&redirect_uri=https%3A%2F%2Fportalfronteiras.ssi.local%2Faplicacoes%2Faplicacoes-fronteira&state=9ce1a4e2-a37a-4782-8532-6f5c9fa7ff48&response_mode=fragment&response_type=code&scope=openid&nonce=5855955a-db20-41f7-bb2c-7203c0a0e64c&code_challenge=UH8xRJYorwCqxL9PSna5Iy8cqxayotY6XZ1QpWfhKpw&code_challenge_method=S256')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Database />} 
+                        label="PRISMA" 
+                        onClick={() => openExternalLink('https://prisma.ssi.local/PRISMA/')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Siren />} 
+                        label="SISII" 
+                        onClick={() => alert('Link SISII indisponível (Rede Interna)')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<ArrowLeftRight />} 
+                        label="EES" 
+                        onClick={() => alert('Link EES indisponível (Rede Interna)')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<Stamp />} 
+                        label="VIS" 
+                        onClick={() => alert('Link VIS indisponível (Rede Interna)')}
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<CreditCard />} 
+                        label="FTA (ANA)" 
+                        onClick={() => openExternalLink('https://apps.ana.pt/BILL_Theme/LoginPage.aspx')}
+                        isCollapsed={isCollapsed}
+                    />
+
+                    {/* Links PF008 merged here */}
+                    {!isCollapsed && (
+                        <div className="px-4 pt-3 pb-1">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                                Links Úteis
+                            </span>
+                        </div>
+                    )}
+                    <MenuItem 
+                        icon={<LinkIcon />} 
+                        label="Link Externo 1" 
+                        isCollapsed={isCollapsed}
+                    />
+                    <MenuItem 
+                        icon={<LinkIcon />} 
+                        label="Link Externo 2" 
+                        isCollapsed={isCollapsed}
+                    />
                 </MenuSection>
 
                 <MenuSection 
@@ -380,7 +380,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                 >
                     {!isCollapsed && (
                         <div className="px-4 pt-3 pb-1">
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
+                            <span className="text-[10px] font-bold text-white uppercase tracking-wider block border-b border-gray-600/50 pb-1 mb-1">
                                 Plataformas de Formação e Ambiente de Testes
                             </span>
                         </div>
@@ -465,7 +465,7 @@ const MenuSection: React.FC<MenuSectionProps> = ({ title, icon, children, defaul
                 )}
             </button>
             <div 
-                className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen && !isCollapsed ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen && !isCollapsed ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'}`}
             >
                 <div className="pb-2">
                     {children}
@@ -486,7 +486,7 @@ const MenuItem: React.FC<{
     <button 
         onClick={onClick}
         className={`w-full flex items-center px-4 py-3 cursor-pointer transition-colors text-sm font-bold text-white
-        ${active ? 'bg-secondary dark:bg-blue-900 border-l-4 border-blue-400' : 'hover:bg-white/10 border-l-4 border-transparent opacity-80 hover:opacity-100'} 
+        ${active ? 'bg-secondary dark:bg-blue-900 border-l-4 border-blue-400' : 'hover:bg-white/10 border-l-4 border-transparent hover:opacity-100'} 
         ${className}
         ${isCollapsed ? 'justify-center border-l-0 px-2' : ''}
         `}
