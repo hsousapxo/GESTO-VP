@@ -310,7 +310,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                                         type="arrival" 
                                         onEdit={onEdit} 
                                         onDelete={handleDelete}
-                                        onSelect={(f) => setSelectedFlightId(f.id!)}
+                                        onSelect={(f) => setSelectedFlightId(prev => prev === f.id ? null : f.id!)}
                                         isSelected={selectedFlightId === flight.id}
                                     />
                                 ))
@@ -347,7 +347,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                                         type="departure" 
                                         onEdit={onEdit} 
                                         onDelete={handleDelete}
-                                        onSelect={(f) => setSelectedFlightId(f.id!)}
+                                        onSelect={(f) => setSelectedFlightId(prev => prev === f.id ? null : f.id!)}
                                         isSelected={selectedFlightId === flight.id}
                                     />
                                 ))
