@@ -191,7 +191,10 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
 
     const handlePrint = () => {
         if (selectedFlightId) {
-            window.print();
+            // Timeout to allow DOM updates/animations to finish before browser print dialog freezes execution
+            setTimeout(() => {
+                window.print();
+            }, 100);
         } else {
             alert("Selecione um voo para imprimir.");
         }
@@ -217,6 +220,8 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
     return (
         <div className="flex flex-col min-h-full bg-[#121212] text-slate-100 font-sans">
             {/* Hidden Document for Printing Selected Flight */}
+            {/* The 'hidden' class hides it on screen. 'print:block' shows it on print. 
+                CSS in index.html ensures main content is hidden during print. */}
             <div className="hidden print:block fixed inset-0 bg-white z-[9999]">
                 {selectedFlight && <FlightDocument flight={selectedFlight} />}
             </div>
