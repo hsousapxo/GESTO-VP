@@ -26,7 +26,7 @@ export interface FlightFormData {
     flightNumber: string;
     flightType: FlightType | ''; 
     flightNature: FlightNature | '';
-    status: FlightStatus;
+    status: FlightStatus; // Global Status
     
     // Movement specific route classification
     arrivalRouteType?: RouteType;
@@ -70,8 +70,10 @@ export interface FlightFormData {
     observations?: string;
     attachmentName?: string;
     
-    // Checklist state (key: boolean)
-    checklist?: Record<string, boolean>;
+    // Checklist states
+    arrivalChecklist?: Record<string, boolean>;
+    departureChecklist?: Record<string, boolean>;
+    checklist?: Record<string, boolean>; // Legacy/Generic
 }
 
 export interface WeatherData {

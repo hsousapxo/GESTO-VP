@@ -203,9 +203,7 @@ function App() {
             case 'ai-image-editor': return <AiImageEditor />;
             case 'weather': return <WeatherView />;
             case 'weather-alerts': return <WeatherAlertsView />;
-            // Fixed: removed duplicate airportCode attribute
             case 'weather-pxo': return <WeatherView airportCode="PXO" />;
-            // Fixed: removed duplicate airportCode attribute
             case 'weather-fnc': return <WeatherView airportCode="FNC" />;
             case 'templates': return <TemplatesView />;
             case 'legislation': return <LegislationView />;
@@ -226,7 +224,14 @@ function App() {
             {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />}
             <Sidebar isOpen={sidebarOpen} currentView={currentView} onChangeView={(view) => { setCurrentView(view); setSidebarOpen(false); if (view !== 'flight-form') setEditingFlight(null); }} onLogout={handleLogout} />
             <div className="flex-1 flex flex-col min-w-0 bg-[#0a0e17]">
-                <Topbar onToggleSidebar={handleToggleSidebar} darkMode={darkMode} toggleDarkMode={toggleDarkMode} onChangeView={setCurrentView} user={user} />
+                <Topbar 
+                    onToggleSidebar={handleToggleSidebar} 
+                    darkMode={darkMode} 
+                    toggleDarkMode={toggleDarkMode} 
+                    onChangeView={setCurrentView} 
+                    user={user} 
+                    onLogout={handleLogout}
+                />
                 <main className="flex-1 overflow-y-auto custom-scrollbar">{renderContent()}</main>
             </div>
         </div>

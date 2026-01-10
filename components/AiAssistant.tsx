@@ -1,5 +1,6 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2, MapPin, Search } from 'lucide-react';
+import { Send, Bot, User, Loader2, MapPin, Search, Info } from 'lucide-react';
 import { ChatMessage } from '../types';
 import { sendMessageToGemini } from '../services/geminiService';
 
@@ -14,6 +15,7 @@ const AiAssistant: React.FC = () => {
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [showTooltip, setShowTooltip] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -80,6 +82,41 @@ const AiAssistant: React.FC = () => {
                     <div className="flex items-center gap-2">
                         <Bot className="w-5 h-5" />
                         <h2 className="font-bold">PF008 IA</h2>
+                        
+                        {/* Tooltip Info */}
+                        <div className="relative ml-1">
+                            <button
+                                onMouseEnter={() => setShowTooltip(true)}
+                                onMouseLeave={() => setShowTooltip(false)}
+                                className="p-1 text-white/60 hover:text-white transition-colors rounded-full hover:bg-white/10 focus:outline-none"
+                                aria-label="Informação sobre o assistente"
+                            >
+                                <Info className="w-4 h-4" />
+                            </button>
+                            
+                            {showTooltip && (
+                                <div className="absolute left-0 top-full mt-2 w-80 p-5 bg-[#1f2937]/95 text-white text-xs rounded-xl shadow-2xl border border-white/10 z-50 animate-in fade-in slide-in-from-top-1 backdrop-blur-md">
+                                    <h4 className="font-bold mb-3 text-blue-400 uppercase tracking-wider flex items-center gap-2 border-b border-white/10 pb-2">
+                                        <Bot className="w-3.5 h-3.5" /> Assistente Operacional
+                                    </h4>
+                                    <p className="leading-relaxed text-gray-300 mb-4 text-sm">
+                                        Este assistente utiliza inteligência artificial avançada (Gemini 3 Pro) para apoiar a atividade diária no Posto de Fronteira.
+                                    </p>
+                                    <div className="space-y-2">
+                                        <p className="font-bold text-gray-400 uppercase tracking-wide text-[10px]">Capacidades Principais:</p>
+                                        <ul className="space-y-1.5 list-none text-gray-300 ml-1">
+                                            <li className="flex gap-2 items-start"><span className="text-blue-500 mt-0.5">•</span><span>Interpretação de Legislação (Lei 23/2007, Código Schengen)</span></li>
+                                            <li className="flex gap-2 items-start"><span className="text-blue-500 mt-0.5">•</span><span>Consulta de Procedimentos Operacionais</span></li>
+                                            <li className="flex gap-2 items-start"><span className="text-blue-500 mt-0.5">•</span><span>Análise de dados meteorológicos e voos</span></li>
+                                        </ul>
+                                    </div>
+                                    <div className="mt-3 pt-3 border-t border-white/10 text-[10px] text-gray-500 italic">
+                                        Nota: As respostas são geradas por IA e devem ser validadas com documentação oficial.
+                                    </div>
+                                    <div className="absolute -top-1 left-3 w-2 h-2 bg-[#1f2937]/95 border-t border-l border-white/10 transform rotate-45"></div>
+                                </div>
+                            )}
+                        </div>
                     </div>
                     <span className="text-xs bg-white/20 px-2 py-1 rounded text-white/90">Gemini 3 Pro</span>
                 </div>
