@@ -81,7 +81,7 @@ const FlightCard: React.FC<{
             onDoubleClick={() => onEdit?.(flight)}
         >
             {isSelected && (
-                <div className="absolute top-4 right-4 bg-blue-500 text-white p-1 rounded-full shadow-lg z-20">
+                <div className="absolute top-4 right-4 bg-blue-500 text-white p-1 rounded-full shadow-lg z-20 animate-in fade-in zoom-in duration-200">
                     <Check className="w-4 h-4" />
                 </div>
             )}
@@ -162,15 +162,13 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
-    const [selectedFlightId, setSelectedFlightId] = useState<string | null>(null);
+    // Changed to array for multi-selection
+    const [selectedFlightIds, setSelectedFlightIds] = useState<string[]>([]);
 
     const loadData = async () => {
         try {
             const data = await getFlights();
             setFlights(data);
-            if (data.length > 0 && !selectedFlightId) {
-                setSelectedFlightId(data[0].id || null);
-            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -180,23 +178,32 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
 
     useEffect(() => { loadData(); }, []);
 
-    const handleDelete = (id: string) => {
-        if(window.confirm('Eliminar voo permanentemente?')) {
-            deleteFlight(id).then(() => {
-                loadData();
-                if (selectedFlightId === id) setSelectedFlightId(null);
-            });
+    const toggleSelection = (id: string) => {
+        setSelectedFlightIds(prev => 
+            prev.includes(id) 
+                ? prev.filter(x => x !== id) 
+                : [...prev, id]
+        );
+    };
+
+    const handleDelete = async () => {
+        if(window.confirm(`Eliminar ${selectedFlightIds.length} voo(s) permanentemente?`)) {
+            for (const id of selectedFlightIds) {
+                await deleteFlight(id);
+            }
+            await loadData();
+            setSelectedFlightIds([]);
         }
     };
 
     const handlePrint = () => {
-        if (selectedFlightId) {
+        if (selectedFlightIds.length > 0) {
             // Timeout to allow DOM updates/animations to finish before browser print dialog freezes execution
             setTimeout(() => {
                 window.print();
             }, 100);
         } else {
-            alert("Selecione um voo para imprimir.");
+            alert("Selecione pelo menos um voo para imprimir.");
         }
     };
 
@@ -215,18 +222,23 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
 
     if (loading) return <div className="min-h-screen bg-[#121212] flex items-center justify-center"><div className="text-gray-500 font-black animate-pulse tracking-widest">A CARREGAR...</div></div>;
 
-    const selectedFlight = flights.find(f => f.id === selectedFlightId);
+    // Get all selected flight objects
+    const selectedFlights = flights.filter(f => f.id && selectedFlightIds.includes(f.id));
+    // For footer details display (show first selected if available)
+    const primarySelection = selectedFlights.length > 0 ? selectedFlights[0] : null;
 
     return (
         <div className="flex flex-col min-h-full bg-[#121212] text-slate-100 font-sans">
-            {/* Hidden Document for Printing Selected Flight */}
-            {/* The 'hidden' class hides it on screen. 'print:block' shows it on print. 
-                CSS in index.html ensures main content is hidden during print. */}
-            <div className="hidden print:block fixed inset-0 bg-white z-[9999]">
-                {selectedFlight && <FlightDocument flight={selectedFlight} />}
+            {/* Hidden Document Container for Printing Multiple Selected Flights */}
+            <div className="official-document-wrapper hidden print:block">
+                {selectedFlights.map((flight) => (
+                    <div key={flight.id} style={{ pageBreakAfter: 'always' }}>
+                        <FlightDocument flight={flight} />
+                    </div>
+                ))}
             </div>
 
-            <div className="flex-grow max-w-7xl mx-auto p-6 md:p-10 w-full print:hidden">
+            <div className="flex-grow max-w-7xl mx-auto p-6 md:p-10 w-full print-hidden">
                 {/* Header */}
                 <header className="mb-12 flex flex-col gap-8">
                     <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
@@ -267,7 +279,7 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                                 Atualizar
                             </button>
                             <button 
-                                onClick={() => { setSearchQuery(''); setSelectedDate(new Date().toISOString().split('T')[0]); }}
+                                onClick={() => { setSearchQuery(''); setSelectedDate(new Date().toISOString().split('T')[0]); setSelectedFlightIds([]); }}
                                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 text-gray-400 hover:text-white hover:bg-white/5 hover:border-white/20 transition-all text-sm font-medium whitespace-nowrap group"
                             >
                                 <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
@@ -275,10 +287,17 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                             </button>
                         </div>
                     </div>
-                    {selectedFlight && (
-                        <div className="flex items-center gap-2 text-gray-400">
-                            <Clock className="w-4 h-4" />
-                            <span className="text-sm font-mono">Último Registo: {selectedFlight.createdAt ? new Date(selectedFlight.createdAt).toLocaleString() : '---'}</span>
+                    {selectedFlights.length > 0 && (
+                        <div className="flex items-center gap-2 text-gray-400 animate-in fade-in slide-in-from-left-2">
+                            <Check className="w-4 h-4 text-blue-500" />
+                            <span className="text-sm font-bold text-white">{selectedFlights.length} voo(s) selecionado(s)</span>
+                            {selectedFlights.length === 1 && (
+                                <>
+                                    <span className="mx-2 text-gray-600">|</span>
+                                    <Clock className="w-4 h-4" />
+                                    <span className="text-sm font-mono">Último Registo: {primarySelection?.createdAt ? new Date(primarySelection.createdAt).toLocaleString() : '---'}</span>
+                                </>
+                            )}
                         </div>
                     )}
                 </header>
@@ -314,9 +333,9 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                                         flight={flight} 
                                         type="arrival" 
                                         onEdit={onEdit} 
-                                        onDelete={handleDelete}
-                                        onSelect={(f) => setSelectedFlightId(prev => prev === f.id ? null : f.id!)}
-                                        isSelected={selectedFlightId === flight.id}
+                                        onDelete={() => {}} // Handled via multi-select delete
+                                        onSelect={(f) => toggleSelection(f.id!)}
+                                        isSelected={selectedFlightIds.includes(flight.id!)}
                                     />
                                 ))
                             )}
@@ -351,9 +370,9 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
                                         flight={flight} 
                                         type="departure" 
                                         onEdit={onEdit} 
-                                        onDelete={handleDelete}
-                                        onSelect={(f) => setSelectedFlightId(prev => prev === f.id ? null : f.id!)}
-                                        isSelected={selectedFlightId === flight.id}
+                                        onDelete={() => {}} // Handled via multi-select delete
+                                        onSelect={(f) => toggleSelection(f.id!)}
+                                        isSelected={selectedFlightIds.includes(flight.id!)}
                                     />
                                 ))
                             )}
@@ -363,56 +382,72 @@ const FlightList: React.FC<FlightListProps> = ({ onEdit, title = "VOOS AGENDADOS
             </div>
 
             {/* Sticky Footer */}
-            <footer className="sticky bottom-0 w-full bg-[#1e1e1e]/95 backdrop-blur-md border-t border-white/5 py-4 px-6 md:px-10 flex flex-col xl:flex-row items-center justify-between z-30 gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] print:hidden">
+            <footer className="sticky bottom-0 w-full bg-[#1e1e1e]/95 backdrop-blur-md border-t border-white/5 py-4 px-6 md:px-10 flex flex-col xl:flex-row items-center justify-between z-30 gap-4 shadow-[0_-10px_40px_rgba(0,0,0,0.5)] print-hidden">
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 justify-center xl:justify-start">
                     <div className="flex items-center gap-2 text-gray-400 border-r border-white/10 pr-6 last:border-0">
                         <Info className="w-5 h-5" />
-                        <span className="text-sm font-medium">GESDOC: <span className="text-white font-bold ml-1">{selectedFlight ? selectedFlight.gesdocNumber || 'PENDENTE' : `#${new Date().getFullYear()}-${flights.length}`}</span></span>
+                        <span className="text-sm font-medium">GESDOC: 
+                            <span className="text-white font-bold ml-1">
+                                {selectedFlights.length === 1 ? (primarySelection?.gesdocNumber || 'PENDENTE') : selectedFlights.length > 1 ? 'VÁRIOS' : `#${new Date().getFullYear()}-${flights.length}`}
+                            </span>
+                        </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-400 border-r border-white/10 pr-6 last:border-0">
                         <Calendar className="w-5 h-5" />
-                        <span className="text-sm font-medium">Data: <span className="text-white font-bold ml-1">{selectedFlight ? new Date(selectedFlight.createdAt || Date.now()).toLocaleDateString() : new Date().toLocaleDateString()}</span></span>
+                        <span className="text-sm font-medium">Data: 
+                            <span className="text-white font-bold ml-1">
+                                {selectedFlights.length === 1 ? new Date(primarySelection?.createdAt || Date.now()).toLocaleDateString() : new Date().toLocaleDateString()}
+                            </span>
+                        </span>
                     </div>
                     <div className="flex items-center gap-2 text-gray-400 border-r border-white/10 pr-6 last:border-0 hidden md:flex">
                         <User className="w-5 h-5" />
-                        <span className="text-sm font-medium">Resp: <span className="text-white font-bold ml-1">{selectedFlight?.createdBy || '---'}</span></span>
+                        <span className="text-sm font-medium">Resp: 
+                            <span className="text-white font-bold ml-1">
+                                {selectedFlights.length === 1 ? (primarySelection?.createdBy || '---') : '---'}
+                            </span>
+                        </span>
                     </div>
                      <div className="flex items-center gap-2 text-gray-400 hidden lg:flex">
                         <PenTool className="w-5 h-5" />
-                        <span className="text-sm font-medium">Ultima Edição: <span className="text-white font-bold ml-1">{selectedFlight?.createdAt ? new Date(selectedFlight.createdAt).toLocaleTimeString() : '--:--'}</span></span>
+                        <span className="text-sm font-medium">Ultima Edição: 
+                            <span className="text-white font-bold ml-1">
+                                {selectedFlights.length === 1 && primarySelection?.createdAt ? new Date(primarySelection.createdAt).toLocaleTimeString() : '--:--'}
+                            </span>
+                        </span>
                     </div>
                 </div>
                 
                 <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 w-full xl:w-auto justify-center xl:justify-end custom-scrollbar">
                     <button 
                         onClick={handlePrint}
-                        disabled={!selectedFlightId}
-                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightId ? 'bg-white/10 text-blue-400 hover:text-white hover:bg-blue-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
-                        title="Imprimir Auto"
+                        disabled={selectedFlightIds.length === 0}
+                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightIds.length > 0 ? 'bg-white/10 text-blue-400 hover:text-white hover:bg-blue-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
+                        title={selectedFlightIds.length > 1 ? "Imprimir Todos Selecionados" : "Imprimir Auto"}
                     >
                         <Printer className="w-5 h-5" />
                     </button>
                     <button 
-                        disabled={!selectedFlightId}
-                        onClick={() => selectedFlight && onEdit?.(selectedFlight)}
-                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightId ? 'bg-white/10 text-blue-400 hover:text-white hover:bg-blue-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
-                        title="Editar"
+                        disabled={selectedFlightIds.length !== 1} // Only edit single item
+                        onClick={() => primarySelection && onEdit?.(primarySelection)}
+                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightIds.length === 1 ? 'bg-white/10 text-blue-400 hover:text-white hover:bg-blue-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
+                        title="Editar (Apenas 1)"
                     >
                         <Pencil className="w-5 h-5" />
                     </button>
                     <button 
-                        disabled={!selectedFlightId}
-                        onClick={handlePrint}
-                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightId ? 'bg-white/10 text-red-400 hover:text-white hover:bg-red-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
+                        disabled={selectedFlightIds.length === 0}
+                        onClick={handlePrint} // Currently same as print, typically handled by browser PDF export
+                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightIds.length > 0 ? 'bg-white/10 text-red-400 hover:text-white hover:bg-red-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
                         title="Exportar PDF"
                     >
                         <FileText className="w-5 h-5" />
                     </button>
                     <div className="w-px h-6 bg-white/10 mx-1 flex-shrink-0"></div>
                     <button 
-                        disabled={!selectedFlightId}
-                        onClick={() => selectedFlightId && handleDelete(selectedFlightId)}
-                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightId ? 'bg-white/10 text-red-500 hover:text-white hover:bg-red-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
+                        disabled={selectedFlightIds.length === 0}
+                        onClick={handleDelete}
+                        className={`w-10 h-10 flex flex-shrink-0 items-center justify-center rounded-lg transition-all ${selectedFlightIds.length > 0 ? 'bg-white/10 text-red-500 hover:text-white hover:bg-red-600' : 'bg-white/5 text-gray-600 cursor-not-allowed'}`}
                         title="Eliminar Seleção"
                     >
                         <Trash2 className="w-5 h-5" />

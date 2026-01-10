@@ -60,40 +60,45 @@
           margin: 0;
           size: auto;
         }
+        
         body {
           background-color: white !important;
           color: black !important;
         }
-        
-        /* Force hide specific UI elements */
-        nav, aside, header, .sidebar, .topbar, button, .print-hidden, .no-print, [role="button"], input, select, footer {
+
+        /* Hide specific app UI elements explicitly */
+        nav, aside, header, .sidebar, .topbar, footer, .print-hidden, .no-print {
           display: none !important;
         }
 
-        /* Reset Layout for Print Container */
-        #root, main, .flex-1 {
-          display: block !important;
-          background-color: white !important;
+        /* Ensure root containers allow visibility */
+        #root, main {
+          background-color: transparent !important;
           margin: 0 !important;
           padding: 0 !important;
           width: 100% !important;
           height: auto !important;
           overflow: visible !important;
-          position: static !important;
+          display: block !important;
         }
 
-        /* Ensure Official Document is Visible and Full Width */
-        .official-document {
+        /* The container for the official document must be absolutely visible */
+        .official-document-wrapper {
           display: block !important;
-          width: 100% !important;
-          max-width: none !important;
-          margin: 0 !important;
-          padding: 1.5cm !important;
           position: absolute;
           top: 0;
           left: 0;
+          width: 100%;
           z-index: 9999;
           background: white !important;
+        }
+        
+        /* Ensure the document itself is styled correctly */
+        .official-document {
+          width: 100% !important;
+          margin: 0 !important;
+          padding: 1cm !important;
+          box-shadow: none !important;
         }
       }
     </style>

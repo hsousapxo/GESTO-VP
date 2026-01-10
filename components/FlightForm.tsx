@@ -164,12 +164,14 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
         }
     };
 
+    // --- SISTEMA DE CORES DE STATUS ---
     const getStatusStyles = (status?: FlightStatus) => {
         switch (status) {
-            case 'Agendado': return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 border-yellow-500/30';
-            case 'Confirmado': return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30';
-            case 'Realizado': return 'bg-green-500/10 text-green-600 dark:text-green-500 border-green-500/30';
-            case 'Cancelado': return 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/30';
+            case 'Agendado': return 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 border-yellow-500/30 focus:ring-yellow-500/50';
+            case 'Confirmado': return 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/30 focus:ring-blue-500/50';
+            case 'Realizado': return 'bg-green-500/10 text-green-600 dark:text-green-500 border-green-500/30 focus:ring-green-500/50';
+            case 'Cancelado': return 'bg-red-500/10 text-red-600 dark:text-red-500 border-red-500/30 focus:ring-red-500/50';
+            case 'Arquivado': return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/30 focus:ring-purple-500/50';
             default: return 'bg-gray-500/10 text-gray-500 border-gray-500/30';
         }
     };
@@ -270,7 +272,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         <div className="space-y-1.5 relative">
                             <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">N.º de Voo *</label>
                             <input 
@@ -297,7 +299,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
                             <select 
                                 value={formData.flightNature}
                                 onChange={e => updateField('flightNature', e.target.value)}
-                                className="w-full bg-gray-50 dark:bg-[#1c2636] border border-gray-200 dark:border-white/10 rounded-xl py-4 px-5 text-sm text-gray-900 dark:text-white font-bold outline-none appearance-none cursor-pointer transition-all"
+                                className="w-full bg-gray-50 dark:bg-[#1c2636] border border-gray-200 dark:border-white/10 rounded-xl py-4 px-5 text-sm text-gray-900 dark:text-white font-bold outline-none appearance-none cursor-pointer transition-all focus:ring-2 focus:ring-primary"
                             >
                                 <option value="Voo Privado">Voo Privado</option>
                                 <option value="Voo Comercial">Voo Comercial</option>
@@ -314,6 +316,20 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
                                 onChange={e => updateField('gesdocNumber', e.target.value)}
                                 className="w-full bg-gray-50 dark:bg-[#1c2636] border border-gray-200 dark:border-white/10 rounded-xl py-4 px-5 text-sm text-gray-900 dark:text-white font-bold outline-none focus:ring-2 focus:ring-primary shadow-inner transition-all"
                             />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">Estado Global</label>
+                            <select 
+                                value={formData.status}
+                                onChange={e => updateField('status', e.target.value as FlightStatus)}
+                                className={`w-full px-4 py-4 rounded-xl text-xs font-black uppercase tracking-widest border outline-none cursor-pointer transition-all shadow-inner focus:ring-2 ${getStatusStyles(formData.status)}`}
+                            >
+                                <option value="Agendado">Agendado</option>
+                                <option value="Confirmado">Confirmado</option>
+                                <option value="Realizado">Realizado</option>
+                                <option value="Cancelado">Cancelado</option>
+                                <option value="Arquivado">Arquivado</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -347,7 +363,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
                             <select 
                                 value={formData.arrivalStatus}
                                 onChange={e => updateField('arrivalStatus', e.target.value as FlightStatus)}
-                                className={`w-full px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border outline-none cursor-pointer transition-all shadow-sm ${getStatusStyles(formData.arrivalStatus)}`}
+                                className={`w-full px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border outline-none cursor-pointer transition-all shadow-sm focus:ring-2 ${getStatusStyles(formData.arrivalStatus)}`}
                             >
                                 <option value="Agendado">Agendado</option>
                                 <option value="Confirmado">Confirmado</option>
@@ -450,7 +466,7 @@ const FlightForm: React.FC<FlightFormProps> = ({ initialData, onClear, onSaved, 
                             <select 
                                 value={formData.departureStatus}
                                 onChange={e => updateField('departureStatus', e.target.value as FlightStatus)}
-                                className={`w-full px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border outline-none cursor-pointer transition-all shadow-sm ${getStatusStyles(formData.departureStatus)}`}
+                                className={`w-full px-4 py-3 rounded-xl text-xs font-black uppercase tracking-widest border outline-none cursor-pointer transition-all shadow-sm focus:ring-2 ${getStatusStyles(formData.departureStatus)}`}
                             >
                                 <option value="Agendado">Agendado</option>
                                 <option value="Confirmado">Confirmado</option>
