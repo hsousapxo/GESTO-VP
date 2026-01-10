@@ -168,32 +168,31 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, currentView, onChangeView, on
                                 isSmall
                                 className="!border-l-0 text-purple-300"
                             />
+                            <MenuItem 
+                                icon={<Bot className="w-3.5 h-3.5" />} 
+                                label="IA Assistant" 
+                                active={currentView === 'ai-assistant'} 
+                                onClick={() => onChangeView('ai-assistant')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
+                            <MenuItem 
+                                icon={<Camera className="w-3.5 h-3.5" />} 
+                                label="Editor de Imagem IA" 
+                                active={currentView === 'ai-image-editor'} 
+                                onClick={() => onChangeView('ai-image-editor')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
+                            <MenuItem 
+                                icon={<Radar className="w-3.5 h-3.5" />} 
+                                label="Radar de Voos" 
+                                active={currentView === 'flight-tracker'} 
+                                onClick={() => onChangeView('flight-tracker')} 
+                                isCollapsed={isCollapsed}
+                                isSmall
+                            />
                         </SubMenu>
-
-                        <MenuItem 
-                            icon={<Bot className="w-3.5 h-3.5" />} 
-                            label="IA Assistant" 
-                            active={currentView === 'ai-assistant'} 
-                            onClick={() => onChangeView('ai-assistant')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
-                        <MenuItem 
-                            icon={<Camera className="w-3.5 h-3.5" />} 
-                            label="Editor de Imagem IA" 
-                            active={currentView === 'ai-image-editor'} 
-                            onClick={() => onChangeView('ai-image-editor')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
-                        <MenuItem 
-                            icon={<Radar className="w-3.5 h-3.5" />} 
-                            label="Radar de Voos" 
-                            active={currentView === 'flight-tracker'} 
-                            onClick={() => onChangeView('flight-tracker')} 
-                            isCollapsed={isCollapsed}
-                            isSmall
-                        />
                     </SubMenu>
 
                     {/* Folder: Modelos e Formulários */}
